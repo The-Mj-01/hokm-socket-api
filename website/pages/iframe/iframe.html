@@ -1,0 +1,47 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+	</head>
+	<body>
+	</body>
+	<script type="text/javascript">
+		let fullurl = document.location.href
+		fullurl=fullurl.replace("IGHokm","GlobalHokm")
+		if (navigator.userAgent.toLowerCase().includes('iphone')) window.location = fullurl
+     else {
+		const iframe = document.createElement("iframe")
+		iframe.setAttribute("src",fullurl)
+		iframe.setAttribute("id","IGHokm")
+		iframe.setAttribute("frameBorder","0")
+
+		let width = window.innerWidth
+        let height = window.innerHeight
+		let scale = width / 500
+		//iframe.setAttribute("height",height)
+		if (scale < 1) {
+             iframe.style.transform = `scale(${scale})`
+             iframe.style.height=(height / scale)
+
+            // iframe.setAttribute("width","500");
+		} else {
+			iframe.style.height='100%'
+		}
+
+		document.body.appendChild(iframe);
+	}
+
+	</script>
+	<style>
+		#IGHokm {
+			width: 100%;
+			min-width: 500px; 
+            transform-origin: top left;
+			height: 100%;
+			position: fixed;
+			top: 0;
+			left: 0;
+		}
+	</style>
+
+</html>

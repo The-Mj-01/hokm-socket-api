@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+ 	<meta name = "viewport" content = "user-scalable=no, maximum-scale=1, initial-scale=1 ,width=device-width">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="description" content="Hokm">
+	<meta name="keywords" content="online hokm game">
+	<meta name="author" content="ERFANIUM">
+	<meta charset="UTF-8">
+	<title>Hokm</title>
+	<link rel='stylesheet' href='../files/style.css' type='text/css' />
+	<script data-main='../files/js/index' src='../files/js/lib/require.js'></script>
+</head>
+<body ontouchstart="">
+    
+    <div class="splash_screen show" id="loading_page">
+
+
+	<div class="messBox">
+		<div class="loader" style="width: 200px; height: 200px"></div>
+		<div class="load_logo"></div>
+
+	</div>
+
+
+
+</div>
+	<div class = "login hide" id="login_page">
+		<div class="login_green">
+             <div style="width: 100%;text-align: center;margin: 18px 0"><span class="loginTitle">یه اسم انتخاب کن</span></div>
+			<input type="text" id="userName" name="lname" class="name" maxlength="10">
+			<button class="loginButton" id="loginButton">تایید</button>
+			<div style="text-align: center;margin: 18px auto;position: absolute;width: 360px;top: 70%;left:0;right:0;opacity: 0.8"><span class="loginTitle" style="font-size: 13px">با دوبار کلیک کردن روی صفحه میتونی روی حالت تمام صفحه بازی کنی</span></div>
+
+		</div>
+	</div>
+	<div class = "login hide" id="setHokm">
+		<div style="width: 400px;height: 100%;background-color: rgba(19,19,19,0.2);margin: 0 auto;display: flex;  flex-direction: column;
+">
+			<div style="width: 100%;text-align: center;margin: 50px 0"><span class="loginTitle">حکم رو انتخاب کن</span></div>
+			<div class="loginLocation">
+				<div class="playerLocation top" id="hokm_gish"></div>
+				<div class="playerLocation left" id="hokm_del"></div>
+				<div class="playerLocation right" id="hokm_pik"></div>
+				<div class="playerLocation bottom" id="hokm_khesht"></div>
+			</div>
+
+
+		</div>
+	</div>
+	<div class = "login hide" id="gameEnd">
+		<div style="width: 400px;height: 100%;background-color: rgba(19,19,19,1);margin: 0 auto;display: flex;  flex-direction: column;
+">
+			<div style="width: 100%;text-align: center;margin: 50px 0"><span class="loginTitle">.بازی تمام شد</span></div>
+			<img alt="logo" src="/files/img/logo.png">
+			<form action="https://www.google.com" method="get" style="display: contents"><button class="loginButton" id="newGameButton">شروع بازی جدید</button></form>
+		</div>
+	</div>
+	<div class="cornerButton topRight hide"><div class="hokm_icon hide" id="hokm_icon"></div></div>
+	<style>
+		.testBut{
+			width: 30px;height: 30px;
+			position: absolute; top: 0; left: 0;
+			background-color: #9e362f;
+			z-index: 1000;
+		}
+	</style>
+	<div class="testBut hide" id="testBut">TEST</div>
+
+
+	<div id = 'game-region'></div>
+	<div id = 'control-region' hidden>
+		<div id = 'settings-dialog' hidden>
+			<h3>Settings</h3>
+			<table>
+				<tbody>
+					<tr>
+						<th>Player</th>
+						<th>Name</th>
+						<th>Level</th>
+					</tr>
+					<tr>
+						<td>Player 1(you):</td>
+						<td class = 'player-set-name one' contentEditable></td>
+					</tr>
+					<tr>
+						<td>Player 2(East):</td>
+						<td class = 'player-set-name two' contentEditable></td>
+						<td class = 'player-diff two'>
+							<input type="number" min="1" max="4">
+						</td>
+					</tr>
+					<tr>
+						<td>Player 3(North):Player 3(North):</td>
+						<td class = 'player-set-name three' contentEditable></td>
+						<td class = 'player-diff three'>
+							<input type="number" min="1" max="4">
+						</td>
+					</tr>
+					<tr>
+						<td>Player 4(West):</td>
+						<td class = 'player-set-name four' contentEditable></td>
+						<td class = 'player-diff four'>
+							<input type="number" min="1" max="4">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<button class="back-but">Back</button>
+		<button class="newgame-but">Apply</button>
+	</div>
+	<style type="text/css">
+		#pingTime{
+			position: fixed;bottom: 0;left: 0;color: #FFF;z-index: 1001;font-size: 12px;opacity: 1;
+		}
+	</style>
+	<div id="pingTime">
+		N/A ms
+	</div>
+	<div class="cornerButton topLeft hide"><div class="forceStopIcon hide"></div></div>
+
+	<div class="stopFrame hide">
+		<div class="leaveMess">
+			<div style="width: 100%;text-align: center;margin: 18px 0"><span class="leaveTitle">خارج شدن از بازی؟</span></div>
+			<button class="loginButton" id="forceStop" style="color: #222222">بله</button>
+			<button class="loginButton" id="forceStopCancel" style="color: #222222" >خیر</button>
+		</div>
+	</div>
+	<div class="team-score hide" id="team-score">
+		<div class="item right">
+			<div class="top">دست ها</div>
+			<div class="bot score-rounds" id="score-rounds"></div>
+		</div>
+		<div class="item left">
+			<div class="top">بازی ها</div>
+			<div class="bot score-games" id="score-games"></div>
+		</div>
+	</div>
+
+
+</body>
+</html>
