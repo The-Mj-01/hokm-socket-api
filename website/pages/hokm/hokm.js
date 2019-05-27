@@ -1,4 +1,3 @@
-const openFile = require('../../openFile');
 const newRoom = require("../../../gameServer/newRoom");
 const path = require('path');
 

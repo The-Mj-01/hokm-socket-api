@@ -1,20 +1,18 @@
-const S_res=require('./serverResponse');
 Ok=function (req , res ,data) {
     let newData={
         ok:true,
         result:data
-
     };
-    S_res.write(req , res ,JSON.stringify(newData));
+    res.status(200).send(newData)
 
 };
-err=function (req ,rse ,err,msg) {
+err=function (req ,res ,err,msg) {
      let newData={
         ok:false,
         detail:err
     };
      if (msg) newData.msgtext=msg;
-    S_res.write(req , rse ,JSON.stringify(newData));
+     res.status(400).send(newData)
 
 };
 cls=function(req ,res ,cls,detail){
@@ -22,9 +20,7 @@ cls=function(req ,res ,cls,detail){
         ok:true,
         detail:detail
     };
-
-
-    S_res.write(req ,res ,JSON.stringify(newData));
+    res.status(300).send(newData)
 
 };
 

@@ -1,8 +1,4 @@
-const openFile = require('../../openFile');
 const api_res = require('../../../server&routers/API_response');
-const page404 = require('../404/404');
-const newRoom = require("../../../gameServer/newRoom");
-const path = require('path');
 const hokmPgae = require("../hokm/hokm");
 
 

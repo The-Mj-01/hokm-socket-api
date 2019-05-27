@@ -5,7 +5,6 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const serverRouter= require("./serverRouter");
 const http= require("http");
-const serverResp= require("./serverResponse");
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const S_io= require("./socket_io");
@@ -31,10 +30,9 @@ function start() {
         .post(function (req, res){
             let post = req.body;
             if (post) {
-                req.postData = post;
                 serverRouter.route(req, res);
             }
-            else  serverResp.writeErr(req_data, JSON.stringify({status: 'err', ERR: 'fucking problem with post data'}));
+            else  res.status(400).send('BAD REQUEST')
 
         })
     }

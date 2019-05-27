@@ -2,13 +2,14 @@ let api_res=require('../server&routers/API_response');
 let dba=require('./database');
 
 
-postnew=function (req_data) {
-    if (req_data.postData){
-         if (req_data.postData.game_id && req_data.postData.rounds){
-             let game_id=req_data.postData.game_id;
-             let rounds=req_data.postData.rounds*1;
+postnew=function (req , res) {
+    const body = req.body
+    if (body){
+         if (body.game_id && body.rounds){
+             const game_id = body.game_id;
+             const rounds = body.rounds * 1;
              newRoom(game_id,rounds,()=>{
-                 api_res.Ok(req_data,true)
+                 api_res.Ok(req , res ,true)
              });
 
          }
