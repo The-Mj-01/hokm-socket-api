@@ -1,3 +1,4 @@
+const cardDelay = 170;
 define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
     (loadingPage,       main,      config,      ui,       $      , game) => {
         let setHokmDOM = $('#setHokm');
@@ -35,12 +36,12 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
                 setHokmDOM.removeClass('show').addClass('hide');
             }
         }
-        const GAME_config = function (mess) {
+        const gsme_config = function (mess) {
             config.setRoom_id(mess.room_id);
             room_id=mess.room_id;
             config.setLocation(mess.location);
         };
-        const GAME_start = function (mess) {
+        const game_start = function (mess) {
             let location = {};
             loadingPage.errBoxRemove();
             loadingPage.load(false);
@@ -53,26 +54,22 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
             main()
 
         };
-        const GAME_setHakem = function (mess) {
+        const game_setHakem = function (mess) {
             game.run.setStatus('setHakem', true);
 
             let hakem = config.getLocOfPlayers(mess.hakem);
-            if(mess.roundOne===true) {
-                let start = config.getLocOfPlayers(mess.start);
+            if (mess.roundOne) {
+                const start = config.getLocOfPlayers(mess.start);
                 for (let i = 0; i <= mess.i; i++) {
                     let player = (start + i) % 4;
                     game.run.moveCard.toPlayer(player, mess.cards[i]);
                 }
             }
-
             setTimeout(() => {
-                setHakem();
+                game.run.setHakem(hakem);
                 ui.showMoveMess('حاکم: ' + mess.hakem.name)
             }, 1000);
 
-            function setHakem() {
-                game.run.setHakem(hakem);
-            }
         };
         const game_newRound = function (mess) {
             if (mess.mode === 'setHokm') {
@@ -104,17 +101,15 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
                             r++;
                         }
                         five++;
-                        let player = (hakem_location + r) % 4;
+                        const player = (hakem_location + r) % 4;
                         if (!(r === 0 && newfive === 0)) game.run.moveCard.toPlayer(player, mess.cards[i]);
-
                         i++;
                         moveB()
                     }
                     function moveB() {
                         setTimeout(() => {
                             if (i < cards.length) moveA();
-                            else t = 1
-                        }, 200)
+                        }, cardDelay)
                     }
                     moveA();
 
@@ -124,13 +119,13 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
         const game_setHokm = function (mess) {
             if (mess){
                 ui.hideMessage();
-                let pos=config.getLocOfPlayers(mess);
+                const pos=config.getLocOfPlayers(mess);
                 if (pos===0)setHokmDOM.removeClass('hide').addClass('show');
             }
         };
         const game_hokmSeted = function (mess) {
             setHokmDOM.removeClass('show').addClass('hide');
-            let x={
+            const x={
                 khesht:'حکم خشت',
                 pik:'حکم پیک',
                 del:'حکم دل',
@@ -252,8 +247,8 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
 
 
         let routers = {
-            'game_start': GAME_start,
-            'setHakem': GAME_setHakem,
+            'game_start': game_start,
+            'setHakem': game_setHakem,
             'newRound': game_newRound,
             'setHokm': game_setHokm,
             'hokmSeted': game_hokmSeted,
@@ -264,7 +259,7 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
             'test': tset,
             'teamScore': teamScore,
             'gameEnd': gameEnd,
-            'config':GAME_config,
+            'config':gsme_config,
             'newPlayer': game_newPlayer,
             'leftPlayer': game_leftPlayer,
         };

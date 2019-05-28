@@ -247,11 +247,10 @@ define(["ui", "Human", "Ai", "board", "config", "jquery", "rules", "RandomBrain"
                             }.bind(this));
                     },
                     'endRound': function(){
-                        var info = board.desk.score();
-                        console.log(info);
-                        currentPlay = info[0].id;
-                        console.log(currentPlay);
-                        info[0].waste.addCards(info[1],winnerCard);
+                       // let info = board.desk.score();
+                       // currentPlay = info[0].id;
+                       // console.log(currentPlay);
+                     //   info[0].waste.addCards(info[1]);
                         //this.next();
                     },
                     'removeRow':function () {

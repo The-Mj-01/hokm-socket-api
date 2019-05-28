@@ -1,8 +1,8 @@
 let dba=require('../database');
-let newListenner=require('./GAME_input_router').newListenner;
+let newListenner=require('./GameHookRouter').newListenner;
 
 let borCard=require('./shuffleDeck');
-const Game=require('./Game_class');
+const Game=require('./gameClass');
 
 run=function (roomData,io) {
     let room_id=roomData.id;

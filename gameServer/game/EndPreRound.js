@@ -1,17 +1,15 @@
-const sendScore = require("./GAME_sendScore");
-let borCard=require('./shuffleDeck');
+const sendScore = require("./SendScore");
 
-let hs={pik:0,del:1,gish:2,khesht:3};
+const hs={pik:0,del:1,gish:2,khesht:3};
 
 function run(e) {
-    let hokmSwit=hs[e.hokm];
-    let preRoundGame=(e.get().preRoundGame);
-   // let newP=[];
+    const hokmSwit=hs[e.hokm];
+    const preRoundGame=(e.preRoundGame);
     let winner={};
     let winnerScore=0;
     preRoundGame.forEach((p)=>{
         let c=p.card;
-        c.isHokm=p.card.suit*1 === hokmSwit*1;
+        c.isHokm=p.card.suit*1 === hokmSwit * 1;
         c.isSuit=p.card.suit*1 === e.suit*1;
         c.score=c.num;
         if (c.isSuit === true) c.score=  c.score + 100;
@@ -20,23 +18,16 @@ function run(e) {
     });
 
     winner.location==='top'||winner.location==='bottom' ? e.preRoundteamScore.topB++ : e.preRoundteamScore.rightL++;
-/*
-    if (winner.location==='top'||winner.location==='bottom'){
-        e.preRoundteamScore.topB++;
-    }
-    else {
-        e.preRoundteamScore.rightL++;
-    }*/
+
     e.teamEmit('toWaste',{
         location:winner.location,
         card:winner.card
     });
 
     sendScore(e);
+    e.roundNum = 0;
+    e.preRoundStarter = winner;
 
-    e.setPreRoundStarter(winner);
-    e.setStatus('newPreRound');
-    e.run()
 
 
 }

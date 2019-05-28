@@ -1,16 +1,16 @@
-const cardPick=require('./GAME_cardPick');
-const endGame=require('./GAME_endGame');
+const cardPick = require('./CardPick');
+const endGame=require('./EndGame');
 const returnMeBackToRoom = require('./returnMeBackToRoom');
 let io;
 
 
 
 const routes = {
-    start:require('./GAME_start'),
-    setHakem:require('./GAME_setHakem'),
-    newRound:require('./GAME_newRound'),
-    newPreRound:require('./GAME_newPreRound'),
-    hokmSeted:require('./GAME_hokmSeted'),
+    start:require('./gameStart'),
+    newRound:require('./Round').newRound,
+    setHakem:require('./SetHakem'),
+    newPreRound:require('./PreRound'),
+    onHokmSeted :require('./Round').onHokmSet,
 };
 
 Game=function (room_id,rounds,roomData,_io) {
@@ -39,10 +39,10 @@ Game=function (room_id,rounds,roomData,_io) {
     this.cards=[];
     this.roundNum=0;
     this.suit='notSet';
-    this.status='start';
-    this.round=0;
-    this.preRound=0;
+    this.status= 'start';
+    this.preRound= 0;
     this.preRoundStarter='notSet';
+    this.preRoundPlayerNum = 0;
     this.zamine='notSet';
     this.preRoundGame=[];
 
@@ -57,34 +57,38 @@ Game.prototype.teamEmit=function(COM,res){
     });
 
 };
-Game.prototype.run=function(){
+Game.prototype.run=function(status){
+    if (status) this.status = status;
     if (typeof routes[this.status]==='function')routes[this.status](this)
 };
 Game.prototype.setStatus=function(status){
     if (status)this.status=status;
 };
-Game.prototype.setHakem=function(hakem){
-    if (hakem)this.hakem=hakem;
-};
 
-Game.prototype.setHokm=function(hokm){
+Game.prototype.setHokm = function(hokm){
         this.hokm = hokm;
+        if (this.hokm && this.hokm !== 'notSet' && this.hakem){
+            this.teamEmit("setHokm",this.hakem)
+        }
 };
 Game.prototype.setHokmHook=function(hokm,emit){
     if (hokm && this.status==='waitForSetHokm') {
         this.hokm = hokm;
         if (emit) this.teamEmit('hokmSeted', hokm);
-        this.setStatus('hokmSeted');
-        this.run();
+        this.run('onHokmSeted');
     }
-    else  console.log(this.status)
+    else  {
+        console.log('bad status');
+        console.log(this.status)
+
+    }
 
 
 };
 
 
 Game.prototype.pickCard=function(res){
-   cardPick(this,res)
+    cardPick(this , res)
 };
 Game.prototype.hook=function(id,mess){
     this.setUpdate();
@@ -94,40 +98,11 @@ Game.prototype.hook=function(id,mess){
     else if (com ==='forceStop') endGame(this,1,mess.res)
     else if (com ==='returnMeBackToRoom') returnMeBackToRoom(this,mess.res)
 };
-Game.prototype.setCards=function(C){
-    this.cards=C;
-};
-
-Game.prototype.setPreRoundStarter=function(C){
-    this.preRoundStarter=C;
-};
-
-Game.prototype.setRound=function(C){
-    this.round=C;
-};
 
 Game.prototype.getRoundPlayed=function(){
     return this.roundteamScore.topB + this.roundteamScore.rightL
 };
-Game.prototype.setPreRound=function(C){
-    this.preRound=C;
-};
 
-Game.prototype.get=function(){
-    return this
-};
-Game.prototype.setZamine=function(c){
-    this.zamine=c
-};
-Game.prototype.setPreRoundGame=function(c){
-    this.preRoundGame=c
-};
-Game.prototype.setSuit=function(c){
-    this.suit=c
-};
-Game.prototype.setRounNum=function(c){
-    this.roundNum=c
-};
 
 Game.prototype.nextOf=function(player,x){
   let a={bottom:0,left:1,top:2,right:3};
@@ -156,7 +131,8 @@ Game.prototype.stopUpdateTime=function(){
 };
 Game.prototype.renewPreRoundScore=function () {
     this.preRoundteamScore.rightL=0;
-    this.preRoundteamScore.topB=0
+    this.preRoundteamScore.topB=0;
+    this.roundNum = 0
 };
 function checkUpdateTime(self){
     self.newTime = new Date().getTime();

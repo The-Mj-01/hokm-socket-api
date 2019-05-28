@@ -2,10 +2,10 @@ let playersQueue=[];
 let roomNum=0;
 let rounds=7;
 let loc=["bottom","left","top","right"];
-let newRoomMod=require("./newRoom");
+const  newRoomMod=require("./newRoom");
 let io;
-const newListenner=require('./game/GAME_input_router').newListenner;
-const Game=require('./game/Game_class');
+const newListenner=require('./game/GameHookRouter').newListenner;
+const Game = require('./game/gameClass');
 
 
 newPlayer=function (client,pData,socket_ID,_io) {

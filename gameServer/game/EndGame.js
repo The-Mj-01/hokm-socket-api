@@ -1,9 +1,8 @@
-﻿const axios = require('axios');
-const apiReq = require('../../server&routers/apiGetReq');
+﻿const apiReq = require('../../server&routers/apiGetReq');
 const funcx = require('funcx')(Function);
 const url = require('../../glob_var').app.hook_url;
-const input_router = require('./GAME_input_router');
-let dba = require('../database');
+const input_router = require('./GameHookRouter');
+const dba = require('../database');
 let dataX;
 
 function run(e, mode, forceEndPlayer) {

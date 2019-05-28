@@ -1,6 +1,5 @@
 function run(e) {
-    e.setStatus('setHakem');
     e.teamEmit('game_start',e.players);
-    e.run();
+    e.run('newRound');
 }
 module.exports=run;

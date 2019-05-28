@@ -5,6 +5,9 @@ const data={
         proxy:'http://127.0.0.1:1560',
         cache_pages:true,
         hook_url:"http://vippanel.cf/telegram/callback.php"
+    },
+    game: {
+        globalRounds: 3
     }
 };
 module.exports=data;
