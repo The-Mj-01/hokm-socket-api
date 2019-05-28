@@ -45,14 +45,10 @@ newSocket=function(_io) {
         const  socket = {io: globalHokm, client: client};
         everyNS(client, socket);
         client.on('singUpGlobalRoom', (data) => {
-           // funcx(M_globalRoom.newPlayer)(client, data, client.id, globalHokm)
-            (M_globalRoom.newPlayer)(client, data, client.id, globalHokm)
-
+            funcx(M_globalRoom.newPlayer)(client, data, client.id, globalHokm)
         });
         client.on('disconnect', (r) => {
-           // funcx(M_globalRoom.removePlayer)(client.id)
-            (M_globalRoom.removePlayer)(client.id)
-
+            funcx(M_globalRoom.removePlayer)(client.id)
         })
 
     });
@@ -73,13 +69,13 @@ function everyNS(client,socket) {
                 COM: 'returnMeBackToRoom',
                 res: {client , lastCOM: mess.lastCOM}
             };
-           // funcx(GAME_input_router.route)(client.id, message);
-            (GAME_input_router.route)(client.id, message);
+            funcx(GAME_input_router.route)(client.id, message);
+
 
         });
         client.on('GAME', (mess) => {
-           // funcx(GAME_input_router.route)(client.id, mess);
-            (GAME_input_router.route)(client.id, mess);
+            funcx(GAME_input_router.route)(client.id, mess);
+
         });
         client.on('getMyID', (mess) => {
             client.emit("GAME", {
