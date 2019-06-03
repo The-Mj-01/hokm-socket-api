@@ -1,9 +1,9 @@
 const data={
     app: {
-        port: 80,
-        use_proxy:false,
-        proxy:'http://127.0.0.1:1560',
-        cache_pages:true,
+        ports:{
+            socket:100,
+            files: 80,
+        },
         hook_url:"http://vippanel.cf/telegram/callback.php"
     },
     game: {

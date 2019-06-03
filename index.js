@@ -1,10 +1,5 @@
-console.clear();
-process.setUncaughtExceptionCaptureCallback=(e)=>{
-   console.log("processERR");
-   console.log(e);
-}
-const express =require('./server&routers/express');
-const db =require('./gameServer/database');
+const files = require('./filesServer/Files');
+const socket = require('./socket/Socket');
 
-db.newDB();
-express.start();
+socket();
+files();
