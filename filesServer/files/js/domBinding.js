@@ -1,5 +1,5 @@
-define(function(){
-
+define(['config'],function(config){
+    const chats = ['سلام!','❤️😍','چه دستی!','دمت گرم!' , 'چرا؟' , 'عالیییییی!' , '👌👌' , ]
     let suits = ['spade', 'heart', 'club', 'diamond'];
     let cardTrans={
         A:1,
@@ -60,6 +60,7 @@ define(function(){
         this.id = id;
         this.display = document.createElement('div');
         this.display.className = 'info-board board-' + id;
+        if (id === 0)this.display.className = 'info-board selfBoard board-' + id;
         this.nametext = document.createElement('div');
         this.nametext.className = 'player-name';
         this.nametext.innerHTML = name;
@@ -85,7 +86,7 @@ define(function(){
     };
     PlayerDisplay.prototype.setTurn = function(val){
         let display= $(this.display);
-        val  ? display.addClass("setTurn") : display.removeClass("setTurn")
+        val  ? display.addClass("highlight") : display.removeClass("highlight");
     };
 
 
@@ -123,12 +124,37 @@ define(function(){
         // }, 100);
     };
 
+    const ChatDesk = function() {
+        this.display = document.createElement('div');
+        const chatsSider = document.createElement('div');
+        chatsSider.classList = "chatsSider";
+        chats.forEach(chatMess => {
+            let chat = document.createElement('div');
+            chat.innerHTML = chatMess;
+            chat.className = "chatBox"
+            chat.onclick = function(){
+                window.gameEmitor("chat", {
+                    sender: config.getMyName(),
+                    message: chatMess});
+            }
+            chatsSider.appendChild(chat);
+        });
+        this.display.appendChild(chatsSider);
+        this.display.className = 'chatDesk';
+    }
+
+
+
     return {
         fragmentToDom: function(dom){
             if(frag){
                 dom.appendChild(frag);
                 frag = null;
             }
+        },
+        createChatDesk: function(){
+            const cd = new ChatDesk();
+            document.body.appendChild(cd.display);
         },
         createPlayerDisplay: function(id, name){
             return new PlayerDisplay(id, name);

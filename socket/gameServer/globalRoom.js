@@ -6,11 +6,10 @@ const gamesManager = require('./gamesManager');
 let playersQueue=[];
 let roomNum=0;
 let loc=["bottom","left","top","right"];
-let io;
+const globalHokm = require('../io').of('/globalHokm');
 
 
-newPlayer=function (client,pData,socket_ID,_io) {
-    if(!io) io=_io;
+newPlayer=function (client,pData,socket_ID) {
     client.join('globalWaiters');
     client.emit('room_id','globalWaiters');
     if (socket_ID){
@@ -29,7 +28,7 @@ newPlayer=function (client,pData,socket_ID,_io) {
 
 };
 newPlayerEmit=function (name) {
-    io.in('globalWaiters').emit("GAME",{
+    globalHokm.in('globalWaiters').emit("GAME",{
         COM:'newPlayer',
         res:{
             name:name,
@@ -39,7 +38,7 @@ newPlayerEmit=function (name) {
     })
 };
 leftPlayerEmit=function (name) {
-    io.in('globalWaiters').emit("GAME",{
+    globalHokm.in('globalWaiters').emit("GAME",{
         COM:'leftPlayer',
         res:{
             name:name,

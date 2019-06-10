@@ -1,5 +1,5 @@
-define(["ui", "Human", "Ai", "board", "config", "jquery", "rules", "RandomBrain", "AsyncBrain", "SimpleBrain", "PomDPBrain"],
-    function(ui,   Human,   Ai,   board,   config,   $,        rules,   RandomBrain,   AsyncBrain,   SimpleBrain,   PomDPBrain){
+define(["ui", "Human", "Ai", "board", "config", "jquery", "rules", "RandomBrain", "AsyncBrain", "SimpleBrain", "PomDPBrain" , "domBinding"],
+    function(ui,   Human,   Ai,   board,   config,   $,        rules,   RandomBrain,   AsyncBrain,   SimpleBrain,   PomDPBrain , domBinding){
         "use strict";
         let players=[];
         let rounds;
@@ -30,6 +30,7 @@ define(["ui", "Human", "Ai", "board", "config", "jquery", "rules", "RandomBrain"
             heartBroken = false;
 
             nextTimer = 0;
+            domBinding.createChatDesk();
 
             waitDefer = function(time){
                 var d = $.Deferred();

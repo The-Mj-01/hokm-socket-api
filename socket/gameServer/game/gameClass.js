@@ -1,8 +1,9 @@
 const cardPick = require('./CardPick');
 const endGame=require('./EndGame');
 const returnMeBackToRoom = require('./returnMeBackToRoom');
-const io = require('../../io');
+const io = require('../../io')
 const myDebuger = require('../../myDebug');
+const chat = require('./chat');
 
 
 
@@ -19,7 +20,10 @@ Game=function (room_id,rounds,roomData) {
     this.newTime=0;
     this.oldTime=new Date().getTime();
     this.room_id = room_id;
-    this.emitor = io.of(roomData.namespace).in(this.room_id);
+    
+    this.emit = (x , y) => {
+        io.of('/globalHokm').in(this.room_id).emit(x, y)   
+    } 
 
     this.commits = [];
     this.timer=null;
@@ -54,8 +58,7 @@ Game.prototype.teamEmit=function(COM,res){
     this.commits.push({
         COM, res
     });
-    console.log(io);
-    this.emitor.emit('GAME', {
+    this.emit('GAME', {
         COM: COM,
         res: res
     });
@@ -103,6 +106,8 @@ Game.prototype.hook=function(id,mess){
     else if (com === 'pickCard') this.pickCard(mess.res);
     else if (com ==='forceStop') endGame(this,1,mess.res)
     else if (com ==='returnMeBackToRoom') returnMeBackToRoom(this,mess.res)
+    else if (com ==='chat') chat(this,mess.res)
+
 };
 
 Game.prototype.getRoundPlayed=function(){

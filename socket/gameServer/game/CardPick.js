@@ -1,4 +1,3 @@
-//const GAME_nextPlayer=require('./GAME_nextPlayer');
 const onPlayerPick = require('./PreRound').onPlayerPick;
 
 function run(e,res) {
@@ -21,6 +20,7 @@ function run(e,res) {
             }
         }
     }
+    else (e.teamEmit('debug','wrong player picked card'))
 }
 
 function emit(mess,e){

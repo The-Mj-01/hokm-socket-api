@@ -193,11 +193,6 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
             loadingPage.load(false);
             ui.showMessage(mess)
         };
-        const tset = function (mess) {
-            if (mess)alert(mess);
-            else alert("test");
-            console.log("test",mess);
-        };
         function deskMove(x) {
             x ? desk.removeClass("hide").addClass("show") : desk.removeClass("show").addClass("hide")
         }
@@ -243,6 +238,9 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
                 ui.showMessage(`آنلاین ها: ${mess.length}`)
             },2000)
         };
+        const chat = function(mess){
+            ui.showMoveMess(`${mess.sender}: ${mess.message}`)
+        }
 
 
 
@@ -256,12 +254,12 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
             'playerPickCard': playerPickCard,
             'toWaste': toWaste,
             'alert': game_alert,
-            'test': tset,
             'teamScore': teamScore,
             'gameEnd': gameEnd,
             'config':gsme_config,
             'newPlayer': game_newPlayer,
             'leftPlayer': game_leftPlayer,
+            'chat':chat
         };
         return function (mess) {
             room_id = config.getRoom_id();

@@ -26,6 +26,7 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 let url = new URL(pageURL);
                 this.id=url.searchParams.get('id');
                 this.userName=url.searchParams.get("userName") || "USER";
+                
             }
 
         };
@@ -46,6 +47,8 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
            socket=socketConnect();
 
             window.socket=socket;
+           
+        
 
             socket.on("connect",onConnect);
             socket.on("disconnect",(r)=>{
@@ -86,6 +89,7 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 ui.showMessage(res);
                 loadingPage.load(false);
             });
+            socket.on('debug', (m) => {console.log('deb' , m)})
         };
         getNameSpace();
         function getNameSpace() {
@@ -117,6 +121,17 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 socket.emit('returnRoom',{room , lastCOM});
             }
             else loginRoom[nameSpace]();
+
+            window.gameEmitor = function(COM, res){
+                if (!socket.connected) return alert('اتصال شما با سرور قطع شده است')
+                res.location = config.getLocation()
+                window.socket.emit('GAME', {
+                    room_id: config.getRoom_id(),
+                    COM,
+                    res
+                    
+                });
+            }
             loadingPage.errBoxRemove();
             if (pinginterval) clearInterval(pinginterval);
              pinginterval = setInterval(ping,setIntervalTime);
@@ -128,8 +143,7 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 reconnection: true,
                 reconnectionDelay: 200,
                 reconnectionDelayMax : 1000,
-                //reconnectionAttempts: Infinity,
-                upgrade: true
+                transports: ['websocket'],
             });
             socket.heartbeatTimeout = 20000;
             return socket
@@ -143,6 +157,11 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
         function updatePingDom(ping){
             pingTimeDom.html(ping);
         }
+        $("#pingTime").on('click' ,() => {
+            window.socket.emit("debug");
+        });
+
+        
 
 
 

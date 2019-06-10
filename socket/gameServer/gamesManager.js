@@ -13,11 +13,16 @@ createGlobal = function (room_id , roomData) {
     create(room_id , roomData)
 };
 
-function route(id,mess) {
-    let room_id = mess.room_id;
-
+function route(id , mess , client) {
+    const room_id = mess.room_id;
     if (allGames[room_id]){
-        if (typeof allGames[room_id].hook ==='function')allGames[room_id].hook(id,mess)
+        try{
+            if (typeof allGames[room_id].hook ==='function')allGames[room_id].hook(id,mess)
+        }
+        catch(e){
+            console.log(e)
+            client.emit("debug",{status:"ISR",err: JSON.parse(JSON.stringify(e)) })
+        }
     }
 
 }

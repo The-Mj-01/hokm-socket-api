@@ -11,11 +11,11 @@ require({
             socketRouter:'./socket/socketRouter'
         }
     },
-    ["main2","connectServer","loadingPage","jquery"],
-    function(main,connectToServer,loadingPage,$){
+    ["main2","connectServer","loadingPage","jquery" , "filesLoader"],
+    function(main,connectToServer,loadingPage,$ ){
         window.scrollTo(0,0);
         setViewPort($);
-        disable_scroll_mobile();
+       // disable_scroll_mobile();
         window.scrollTo(0,0);
     });
 

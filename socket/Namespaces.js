@@ -11,7 +11,7 @@ const    myDebug = require('./myDebug');
 getNameSpaces = function(NSs){
     let returnNSpaces = {};
     NSs.forEach((ns)=>{
-        returnNSpaces[ns]= io.of(ns)
+        returnNSpaces[ns]= io.of(`/${ns}`)
     });
     return returnNSpaces
 };
@@ -25,6 +25,7 @@ addNS=function() {
         });
     });
     hokm.on('connection', client => {
+
         const socket= {io: hokm,client: client};
         everyNS(client,socket);
         client.on('loginRoom',(room)=>{
@@ -65,6 +66,10 @@ function everyNS(client) {
         client.emit('pongT', true);
     });
 
+    client.on('debug', () => {
+        client.emit('debug', client.rooms);
+    });
+
     client.on('returnRoom', (mess) => {
         client.join(mess.room);
         const message = {
@@ -78,7 +83,7 @@ function everyNS(client) {
     });
     client.on('GAME', (mess) => {
         myDebug('mess',client,mess);
-        GameHookRouter(client.id, mess);
+        GameHookRouter(client.id, mess, client);
 
     });
     client.on('getMyID', (mess) => {

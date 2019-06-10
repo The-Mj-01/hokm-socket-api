@@ -3,7 +3,7 @@ function(game,    $,        domBinding,   layout,   config){
     window.game=game;
 
     return function () {
-      //  config.setNames(['a','b','c','d']);
+        //config.setNames(['a','b','c','d']);
         game.load();
     $(".cornerButton").removeClass("hide").addClass("show");
         

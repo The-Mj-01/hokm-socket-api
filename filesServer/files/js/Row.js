@@ -44,15 +44,15 @@ define(["layout","./game","./socket/game_sendCard"],
             if (card.parent.id === 0)
                 pos={
                     x: this.left + ind * layout.cardSep,
-                    y: this.distance,
-                    rotation: this.rotation+ (this.left + ind * layout.cardSep )/16 ,
+                    y: this.distance - 30,
+                    rotation: this.rotation + (this.left + ind * layout.cardSep ) /24 ,
                     ind:ind,
                     rootRotation: this.rotation ,
                     rotateY: this.flipped ? 180 : 0,
                     z: ind
                 };
             else
-                pos={
+                pos = {
                     x: (this.left + ind * layout.cardSep)/4,
                     y: this.distance,
                     rotation: this.rotation,
@@ -80,7 +80,8 @@ define(["layout","./game","./socket/game_sendCard"],
         };
 
         Row.prototype.addShift = function(nc){
-            sendCard(this,nc,window.game);
+            const res = sendCard(this,nc,window.game);
+            if (res)
             if(this.curShifted.length === this.maxShift){
                 this.curShifted.shift();
             }

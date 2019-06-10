@@ -2,7 +2,7 @@ define(function(){
     return {
         width: 500,
         height: 500,
-        cardSep: 40,
+        cardSep: 42,
         cardHeight: 100,
         cardWidth: 65,
         rowMargin: 10,

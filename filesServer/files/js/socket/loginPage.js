@@ -15,10 +15,14 @@ define(["socket_io", "jquery", "main2", "game", "loadingPage", "../config", "../
             forceStopDom.click(forceStop);
             $(".forceStopIcon").removeClass('hide').addClass('show').click(() => {
                 $(".stopFrame").removeClass('hide').addClass('show');
+                $("#game-region").addClass('blur');
+
             });
 
             $("#forceStopCancel").click(() => {
                 $(".stopFrame").removeClass('show').addClass('hide');
+                $("#game-region").removeClass('blur');
+
             })
         }
         function forceStop() {
