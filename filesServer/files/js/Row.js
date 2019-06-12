@@ -80,16 +80,15 @@ define(["layout","./game","./socket/game_sendCard"],
         };
 
         Row.prototype.addShift = function(nc){
-            const res = sendCard(this,nc,window.game);
-            if (res)
-            if(this.curShifted.length === this.maxShift){
-                this.curShifted.shift();
-            }
-            this.curShifted.push(nc);
-            if(this.curShifted.length === this.maxShift){
-                this.playedBy.rowSelected(this.maxShift);
-            }
-            this.adjustPos();
+            sendCard(this,nc,window.game);
+            // if(this.curShifted.length === this.maxShift){
+            //     this.curShifted.shift();
+            // }
+            // this.curShifted.push(nc);
+            // if(this.curShifted.length === this.maxShift){
+            //     this.playedBy.rowSelected(this.maxShift);
+            // }
+            // this.adjustPos();
         };
 
         Row.prototype.out = function(card){

@@ -1,5 +1,5 @@
 define(['config'],function(config){
-    const chats = ['سلام!','❤️😍','چه دستی!','دمت گرم!' , 'چرا؟' , 'عالیییییی!' , '👌👌' , ]
+    const chats = ['سلام!','❤️😍','چه دستی!','دمت گرم!' ,'خیلی کارت درسته!', 'چرا؟' ,'از من یاد بگیر', 'عالیییییی!' , '👌👌' ,'اینم دسته؟' ]
     let suits = ['spade', 'heart', 'club', 'diamond'];
     let cardTrans={
         A:1,
@@ -64,11 +64,19 @@ define(['config'],function(config){
         this.nametext = document.createElement('div');
         this.nametext.className = 'player-name';
         this.nametext.innerHTML = name;
+    
 
         this.hakemTag = document.createElement('div');
         this.hakemTag.className = 'hakemTag';
+
+        this.chatbar = document.createElement('div') ;
+        this.chatbar.className = 'chatbar';
+
         this.display.appendChild(this.nametext);
         this.display.appendChild(this.hakemTag);
+        this.display.appendChild(this.chatbar);
+
+        
 
         frag.appendChild(this.display);
 
@@ -87,6 +95,15 @@ define(['config'],function(config){
     PlayerDisplay.prototype.setTurn = function(val){
         let display= $(this.display);
         val  ? display.addClass("highlight") : display.removeClass("highlight");
+    };
+    PlayerDisplay.prototype.showChat = function(mess){
+        let chatbar = $(this.chatbar);
+        chatbar.removeClass('anim');
+        void this.chatbar.offsetWidth;
+        chatbar.html(mess).addClass('anim');
+
+
+        
     };
 
 

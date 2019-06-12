@@ -335,6 +335,9 @@ define(["ui", "Human", "Ai", "board", "config", "jquery", "rules", "RandomBrain"
                 let info = board.desk.score();
                 currentPlay = info[0].id;
                 info[0].waste.addCards(info[1],winnerCard);
+            },
+            chatPlayer(player_id , mess){
+                players[player_id].display.showChat(mess);
             }
         };
 

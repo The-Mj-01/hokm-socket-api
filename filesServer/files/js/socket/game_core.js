@@ -239,7 +239,9 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
             },2000)
         };
         const chat = function(mess){
-            ui.showMoveMess(`${mess.sender}: ${mess.message}`)
+            let playerLoc = config.getLocOfPlayers({location: mess.location});
+            console.log(game)
+            game.run.chatPlayer(playerLoc , mess.message)
         }
 
 
