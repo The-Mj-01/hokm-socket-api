@@ -11,7 +11,7 @@ require({
             socketRouter:'./socket/socketRouter'
         }
     },
-    ["main2","connectServer","loadingPage","jquery" , "filesLoader"],
+    ["main2","connectServer","loadingPage","jquery" ],
     function(main,connectToServer,loadingPage,$ ){
         window.scrollTo(0,0);
         setViewPort($);
