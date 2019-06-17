@@ -1,10 +1,7 @@
 define(["domBinding"],
 function(domBinding){
-    "use strict";
-
-    var suits = ['spade', 'heart', 'club', 'diamond'];
-
-    var Card = function(id){
+    const suits = ['spade', 'heart', 'club', 'diamond'];
+    const Card = function(id){
         this.id = id;
         this.num = id % 13 + 1;
         this.suit = id % 4;

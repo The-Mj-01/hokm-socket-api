@@ -15,8 +15,8 @@ let pinginterval=null;
 let pingResp=true;
 
 
-define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket/game_core","config"],
-    function(socket_io,$,   loadingPage,  loginPage,    ui      , game_core,config){
+define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket/game_core","config" , "Debug"],
+    function(socket_io,$,   loadingPage,       loginPage,          ui      , game_core,      config,    Debug){
         let pingTimeDom = $("#pingTime");
         let globalGame={
             id:null,
@@ -30,6 +30,8 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
             }
 
         };
+
+
         const loginRoom={
             hokm:function () {
                 room=document.location.search.replace('?game=','');
@@ -55,6 +57,7 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 $("#pingTime").html("Disconnected !");
                 evenDisconnected=true;
                 console.log("socket disconnect",r);
+                Debug.log("disconnect")
             });
             socket.on('checkOK',(res)=>{
                 if(res){
@@ -68,10 +71,13 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                     lastCOM = mess;
                     game_core(mess);
                 }
+                Debug.log("GAME" , mess)
+
 
             });
             socket.on('connect_error', (error) => {console.log('connect_error',error)});
-            socket.on('error', (error) => {console.log('error',error)});
+            socket.on('error', (error) => {console.log('error',error); Debug.log("socket error" , error);
+            });
             socket.on('connect_timeout', (error) => {console.log('connect_timeout',error)});
             socket.on('reconnect', (x) => {console.log('reconnect',x)});
             socket.on('reconnecting', (x) => {console.log('reconnecting',x)});
@@ -89,7 +95,10 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 ui.showMessage(res);
                 loadingPage.load(false);
             });
-            socket.on('debug', (m) => {console.log('deb' , m)})
+            socket.on('debug', (m) => {
+                console.log('deb' , m);
+                Debug.log("deb", m)
+            })
         };
         getNameSpace();
         function getNameSpace() {
@@ -115,6 +124,7 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
         }
 
         function onConnect() {
+            Debug.log("connected");
             console.log("socket Connect");
             $("#pingTime").html("Connected");
             if (evenDisconnected && room) {
@@ -159,6 +169,8 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
         }
         $("#pingTime").on('click' ,() => {
             window.socket.emit("debug");
+            Debug.show()
+
         });
 
         

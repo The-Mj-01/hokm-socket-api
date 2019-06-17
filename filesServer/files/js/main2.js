@@ -40,17 +40,11 @@ function(game,    $,        domBinding,   layout,   config){
         $('#control-region')[0].hidden = false;
     });
 
-        $(window).on('wheel', function(event) {
-            if (event.originalEvent.deltaY < 0) {
-                $("#team-score").removeClass("show").addClass("hide");
-            }
-            else {
-                $("#team-score").removeClass("hide").addClass("show");
-            }
-
-
-        });
-        game.run.newGame();//
+    $(window).on('wheel', function(event) {
+        if (event.originalEvent.deltaY < 0) $("#team-score").removeClass("show").addClass("hide");
+        else $("#team-score").removeClass("hide").addClass("show");
+    });
+    game.run.newGame();//
 
 
 
