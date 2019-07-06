@@ -338,7 +338,8 @@ define(["ui", "Human", "Ai", "board", "config", "jquery", "rules", "RandomBrain"
             },
             chatPlayer(player_id , mess){
                 players[player_id].display.showChat(mess);
-            }
+            },
+            returnPlayer:(player_id) => players[player_id],
         };
 
         return game

@@ -8,7 +8,7 @@ define(["../config",],(config)=>{
                 let plyaer_i = game.run.getPlayers()[0];
                 let myCards = plyaer_i.row.cards;
                 myCards.forEach((e) => {
-                    if (e.suit == currnetSuit) hasSuit = true
+                    if (e.suit === currnetSuit) hasSuit = true
                 })
             }
 
@@ -29,8 +29,8 @@ define(["../config",],(config)=>{
 
         }
         else {
-             alert("disscinected from server")
+             alert("disconnected from server");
              return false;
-            };
+            }
     }
 });

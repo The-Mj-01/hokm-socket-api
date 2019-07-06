@@ -1,29 +1,29 @@
 const onPlayerPick = require('./PreRound').onPlayerPick;
 
-function run(e,res) {
-    if (e.preRoundGame[e.roundNum].location === res.location) {
-        if (e.suit === 'notSet') {
-            e.preRoundGame[e.roundNum].card = res.card;
-            e.suit = res.card.suit;
-            res.card.hasSuit = true;
-            emit(res, e);
-            onPlayerPick(e)
-        } else {
-            if (res.card.suit * 1 === e.suit * 1) add();
-            else if (res.card.hasSuit === false) add();
+async function emit(e, mess, location) {
+    mess.location = location;
+    await e.teamEmit('playerPickCard', mess);
+}
 
-            function add() {
-                e.preRoundGame[e.roundNum].card = res.card;
-                e.preRoundGame = (e.preRoundGame);
-                emit(res, e);
-                onPlayerPick(e)
-            }
-        }
+
+async function run(e, res, location) {
+
+    async function add() {
+        e.preRoundGame[e.roundNum].card = res.card;
+        await emit(e, res, location);
+        console.log("ALL P")
+        onPlayerPick(e)
     }
-    else (e.teamEmit('debug','wrong player picked card'))
+
+    if (e.suit === 'notSet') {
+        e.suit = res.card.suit;
+        res.card.hasSuit = true;
+        await add();
+    } else {
+        if (res.card.suit * 1 === e.suit * 1) await add();
+        else if (res.card.hasSuit === false) await add();
+    }
 }
 
-function emit(mess,e){
-    e.teamEmit('playerPickCard',mess);
-}
-module.exports=run;
+
+module.exports = run;

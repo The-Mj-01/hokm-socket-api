@@ -12,6 +12,28 @@ define(function(){
     var suit;
     var wasteCards=[];
 
+    const STN =  {
+        buttom: 0,
+        left: 1,
+        top: 2,
+        right: 3,
+    };
+    const NTS =  {
+        0: "bottom",
+        1: "left",
+        2: "top",
+        3: "right",
+    };
+
+    function toName (number) {
+        if (typeof number === 'number') return NTS[number];
+        else return number
+    }
+
+     function toNum (name) {
+        if (typeof name === 'string') return STN[name];
+        else return name
+    }
 
     return {
         setMyName:function(name){
@@ -29,22 +51,25 @@ define(function(){
             localStorage.setItem("levels", JSON.stringify(levels));*/
         },
         setLocation:function (l) {
-          location=l;
+            l = toName(l);
+            console.log('set' , l)
+          location = l;
         },
         getLocation:function () {
             return location
         },
         getPlayers:function (array) {
-            let me,others=[],i=0;
-            array.forEach(()=>{
-                if (array[i].location===location)me=array[i];
-                else others.push(array[i]);
-                i++;
+            let me;
+            let others= [];
+            array.forEach((player)=>{
+                player.location = toName(player.location)
+                if (player.location === toName(location)) me = player;
+                else others.push(player);
             });
-            players={me,others};
-            return players
+            return{ me,others };
         },
         getLocOfPlayers:function (player){
+            player.location = toName(player.location);
           if (player) {
               if (location === 'bottom') {
                   if (player.location === 'bottom') return 0;

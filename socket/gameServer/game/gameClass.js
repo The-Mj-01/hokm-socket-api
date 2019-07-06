@@ -1,9 +1,12 @@
+const Player = require('./Player');
 const cardPick = require('./CardPick');
 const endGame=require('./EndGame');
 const returnMeBackToRoom = require('./returnMeBackToRoom');
-const io = require('../../io')
+const io = require('../../io');
 const myDebuger = require('../../myDebug');
 const chat = require('./chat');
+const { toNum } = require('./Location');
+const Promise = require('bluebird');
 
 
 
@@ -21,16 +24,24 @@ Game=function (room_id,rounds,roomData) {
     this.oldTime=new Date().getTime();
     this.room_id = room_id;
     
-    this.emit = (x , y) => {
-        io.of('/globalHokm').in(this.room_id).emit(x, y)   
-    } 
 
     this.commits = [];
     this.timer=null;
+    this.players = {
+        0: null,
+        1: null,
+        2: null,
+        3: null
+    };
+    this.players.toArray = function () {
+        const players = [ this[0] , this[1] , this[2] , this[3] ];
+        return  players.filter((p) => p != null);
+    };
 
-    this.rounds=rounds;
-    this.gameType=roomData.type;
-    this.players=roomData.players;
+
+    this.rounds = rounds;
+    this.gameType = roomData.type;
+    this.namespace = roomData.namespace;
     this.preRoundteamScore={
         topB:0,
         rightL:0
@@ -39,6 +50,7 @@ Game=function (room_id,rounds,roomData) {
         topB:0,
         rightL:0
     };
+    this._isGameStarted = false;
     this.hakem='notSet';
     this.hokm='';
     this.cards=[];
@@ -50,21 +62,50 @@ Game=function (room_id,rounds,roomData) {
     this.preRoundPlayerNum = 0;
     this.zamine='notSet';
     this.preRoundGame=[];
+    this.numofPlayers = 0;
     this.setUpdate();
 
 
 };
-Game.prototype.teamEmit=function(COM,res){
-    this.commits.push({
-        COM, res
-    });
-    this.emit('GAME', {
-        COM: COM,
-        res: res
-    });
-    myDebuger('GAME' , COM , JSON.stringify(res))
 
+Game.prototype.emit = function(x , y){ // todo: remove
+    io.of('/globalHokm').in(this.room_id).emit(x, y)
+};
 
+Game.prototype.addplayer = function(scoket ,location , playerData) {
+    const {name, tgID} = playerData;
+    if (location) location = toNum(location);
+    else location = this.getEmptyLocations()[0];
+
+    if (this.players[location]) this.players[location].setupNewSocket(scoket);
+
+    else {
+        this.numofPlayers++;
+        const player = new Player(scoket, location, this, name, tgID);
+        this.players[location] = player;
+        const onlines = this.numofPlayers;
+        if (onlines < 4 )this.teamEmit('newPlayer', {name , length: onlines});
+        player.events.on('disconnect' , () => {
+            if (!this._isGameStarted) {
+                this.numofPlayers--;
+                delete this.players[location]
+            }
+        });
+        if (!this._isGameStarted && this.players.toArray().length >= 4){
+            this.run('start');
+        }
+    }
+};
+
+// Game.prototype.teamEmit=function(COM,res){
+//     this.emit('GAME', {
+//         COM: COM,
+//         res: res
+//     });
+// };
+Game.prototype.teamEmit = function(COM , res , withoutCB){
+    return Promise.all(this.players.toArray().map(p => p.send(COM , res , withoutCB)))
+        .timeout(60 * 1000)
 };
 Game.prototype.run=function(status){
     if (status) this.status = status;
@@ -74,40 +115,45 @@ Game.prototype.setStatus=function(status){
     if (status)this.status=status;
 };
 
-Game.prototype.setHokm = function(hokm){
+Game.prototype.setHokm = async function(hokm){
         this.hokm = hokm;
         if (this.hokm && this.hokm !== 'notSet' && this.hakem){
-            this.teamEmit("setHokm",this.hakem)
+            await this.teamEmit("setHokm",this.hakem)
         }
 };
-Game.prototype.setHokmHook=function(hokm,emit){
+Game.prototype.sendChat = function(chatMess , location){
+    chat(this , chatMess , location);
+};
+Game.prototype._setHokmEvent = async function(hokm,emit){
     if (hokm && this.status==='waitForSetHokm') {
         this.hokm = hokm;
-        if (emit) this.teamEmit('hokmSeted', hokm);
+        if (emit) await this.teamEmit('hokmSeted', hokm);
         this.run('onHokmSeted');
     }
     else  {
         console.log('bad status');
         console.log(this.status)
-
     }
-
-
 };
 
+Game.prototype._joinOfflinePlayer = function(socket){
+    if (!this._isGameStarted) return;
+    const { location } = socket.userData;
+    console.log(location);
+    const [player] = this.players.toArray().filter((p) => p.location === location);
+    if (player) player.setupNewSocket(socket);
+};
 
-Game.prototype.pickCard=function(res){
-    cardPick(this , res)
+Game.prototype._forceEndGame = function(player){
+    endGame(this,1, player.name)
+};
+Game.prototype._pickCard=function(card , location){
+    cardPick(this , card , location)
 };
 Game.prototype.hook=function(id,mess){
     this.setUpdate();
-    const com = mess.COM;
-    if (com === 'setHokm') this.setHokmHook(mess.res.hokm,true);
-    else if (com === 'pickCard') this.pickCard(mess.res);
-    else if (com ==='forceStop') endGame(this,1,mess.res)
-    else if (com ==='returnMeBackToRoom') returnMeBackToRoom(this,mess.res)
-    else if (com ==='chat') chat(this,mess.res)
-
+    const  { COM } = mess;
+    if (COM === 'JOIN_ME') this._joinOfflinePlayer(mess.res);
 };
 
 Game.prototype.getRoundPlayed=function(){
@@ -115,7 +161,7 @@ Game.prototype.getRoundPlayed=function(){
 };
 
 
-Game.prototype.nextOf=function(player,x){
+Game.prototype.nextOf=function(player,x){  // todo: remove
   let a={bottom:0,left:1,top:2,right:3};
   let b=a[player.location]+x;
     if (b===4)b=0;
@@ -124,9 +170,7 @@ Game.prototype.nextOf=function(player,x){
     if (b===7)b=3;
     return b
 };
-Game.prototype.getPlayerLoc=function(player){
-    return {bottom:0,left:1,top:2,right:3}[player.location]
-};
+
 Game.prototype.setUpdate=function(){
     self=this;
     this.stopUpdateTime();
@@ -145,13 +189,22 @@ Game.prototype.renewPreRoundScore=function () {
     this.preRoundteamScore.topB=0;
     this.roundNum = 0
 };
+
+Game.prototype.getEmptyLocations=function () {
+    const defaultLocations = [0 , 1 , 2 , 3];
+    const usedLocations = this.players.toArray().map((p) => p.location);
+    return defaultLocations.filter((loc) => {
+        const location = usedLocations.filter((l) => loc === l );
+        return (location.length === 0);
+    });
+};
+
 function checkUpdateTime(self){
     self.newTime = new Date().getTime();
     let delta = self.newTime - self.oldTime;
     if (delta > (5*60*1000)){
      endGame(self,2)
     }
-
 }
 
 

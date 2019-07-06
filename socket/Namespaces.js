@@ -5,6 +5,8 @@ const    M_loginRoom = require('./gameServer/loginRoom');
 const    GameHookRouter = require('./gameServer/gamesManager').route;
 const    io = require('./io');
 const    myDebug = require('./myDebug');
+const auth = require('./gameServer/auth');
+
 
 
 
@@ -41,19 +43,18 @@ addNS=function() {
 
     });
     globalHokm.on('connection', (client) => {
+
         const  socket = {io: globalHokm, client: client};
 
         everyNS(client, socket);
         client.on('singUpGlobalRoom', (data) => {
-            myDebug('singUpGlobalRoom',client,data);
+            //myDebug('singUpGlobalRoom',client,data);
+            //console.log(client.handshake.headers);
+
 
             (M_globalRoom.newPlayer)(client, data, client.id, globalHokm)
         });
-        client.on('disconnect', (r) => {
-            myDebug('disconnect',client, r);
 
-            (M_globalRoom.removePlayer)(client.id)
-        })
 
     });
 
@@ -66,31 +67,15 @@ function everyNS(client) {
         client.emit('pongT', true);
     });
 
-    client.on('debug', () => {
-        client.emit('debug', client.rooms);
-    });
-
-    client.on('returnRoom', (mess) => {
-        client.join(mess.room);
-        const message = {
-            room_id: mess.room,
-            COM: 'returnMeBackToRoom',
-            res: {client , lastCOM: mess.lastCOM}
-        };
-       // GameHookRouter(client.id, message);
-
+    client.on('token', (token) => {
+        const userData = auth.verify(token);
+        if (userData) {
+            client.userData = userData;
+            GameHookRouter(client , {COM: 'JOIN_ME' , res: client})
+        }
 
     });
-    client.on('GAME', (mess) => {
-        myDebug('mess',client,mess);
-        GameHookRouter(client.id, mess, client);
 
-    });
-    client.on('getMyID', (mess) => {
-        client.emit("GAME", {
-            COM: "test", res: client.id
-        })
-    });
     client.on('error', function (err) {
         myDebug('error',client,err);
     });

@@ -13,39 +13,40 @@ function run(e, mode, forceEndPlayer) {
         console.log(e);
         console.log(error)
     }
-    daleteBadPlayersData(e);
+    const playerData = daleteBadPlayersData(e);
 
 
     if (mode === 0) {
-        e.teamEmit("gameEnd", true);
-        dataX = post_endGame(e);
+        e.teamEmit("gameEnd", true , true);
+        dataX = post_endGame(e , playerData);
         removeGame(e.room_id);
 
     } else if (mode === 1) {
-        e.teamEmit("gameEnd", true);
-        if (forceEndPlayer)
-            if (forceEndPlayer.name)
-        e.teamEmit("alert", forceEndPlayer.name + " بازی را ترک کرد");
-        dataX = post_forceEndGame(e, forceEndPlayer);
-        removeGame(e.room_id);
+        e.teamEmit("gameEnd", true , true);
+        if (forceEndPlayer){
+            e.teamEmit("alert", forceEndPlayer + " بازی را ترک کرد");
+            dataX = post_forceEndGame(e, forceEndPlayer);
+        }
+
+        removeGame(e.room_id , playerData);
 
     } else if (mode === 2) {
         e.teamEmit("alert", "بازی به علت غیرفعال بودن بازیکنان، تمام شد.");
-        e.teamEmit("gameEnd", true);
+        e.teamEmit("gameEnd", true , true);
         dataX = post_gameIsClose(e);
-        removeGame(e.room_id);
+        removeGame(e.room_id , playerData);
     }
     if (dataX) apiReq.post(url, dataX, (data) => {});
 
     clearFromDb(e);
 }
 
-function post_endGame(e) {
+function post_endGame(e , PD) {
     return {
         mode: 0,
         gameType:e.gameType,
         room_id: e.room_id,
-        players: e.players,
+        players: PD,
         teamScore: e.roundteamScore
     };
 
@@ -95,8 +96,8 @@ function clearFromDb(e) {
 
 }
 daleteBadPlayersData=function(e){
-    let p=[];
-    e.players.forEach(player=>{
+    let p = [];
+    e.players.toArray().forEach(player=>{
         p.push({
             name:player.name,
             location:player.location
@@ -107,7 +108,7 @@ daleteBadPlayersData=function(e){
             });
         }
     });
-    e.players=p;
+    return p;
 };
 module.exports = run;
 

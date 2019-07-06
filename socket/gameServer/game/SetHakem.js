@@ -12,31 +12,32 @@ function  getCardsToSetHakem(e) {
     }
 }
 
-function run(e) {
+async function run(e) {
    if (e.getRoundPlayed() === 0){
        const { bored , i , players} = getCardsToSetHakem(e);
        const hakem = players[i % 4];
        e.hakem = hakem;
-       e.teamEmit('setHakem', {
-           roundOne:true, cards: bored, i: i, hakem: hakem, start: players[0],
+       await e.teamEmit('setHakem', {
+           roundOne:true, cards: bored, i: i, hakem: hakem.toView(), start: players[0].toView(),
        });
+
    } else {
        if (e.preRoundteamScore.rightL > e.preRoundteamScore.topB){
-           if (e.hakem.location ==='top' || e.hakem.location ==='bottom') setNewHakem(e)
+           if (e.hakem.location ==='top' || e.hakem.location ==='bottom') await setNewHakem(e)
        }
        else if (e.preRoundteamScore.rightL < e.preRoundteamScore.topB){
-           if (e.hakem.location ==='right' || e.hakem.location ==='left') setNewHakem(e)
+           if (e.hakem.location ==='right' || e.hakem.location ==='left') await setNewHakem(e)
        }
    }
 
 
 
 }
-function setNewHakem(e){
+async function setNewHakem(e){
     const hakemLoc = e.nextOf(e.hakem,1);
     e.hakem = e.players[hakemLoc];
-    e.teamEmit('setHakem', {
-        roundOne:false, hakem: e.hakem,
+    await e.teamEmit('setHakem', {
+        roundOne:false, hakem: e.hakem.toView(),
     });
 }
 

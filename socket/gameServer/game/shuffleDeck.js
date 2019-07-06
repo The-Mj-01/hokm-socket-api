@@ -1,13 +1,13 @@
 function run() {
     let carddeck = [];
-    for(var i = 0; i < 52; i++) {
+    for(let i = 0; i < 52; i++) {
         carddeck.push(i);
     }
 
 
-    for(i = 0; i < 52; i++){
-        var ran = Math.floor(Math.random() * (52 - i));
-        var tmp = carddeck[ran];
+    for(let i = 0; i < 52; i++){
+        let ran = Math.floor(Math.random() * (52 - i));
+        let tmp = carddeck[ran];
         carddeck[ran] = carddeck[51-i];
         carddeck[51 - i] = tmp;
     }

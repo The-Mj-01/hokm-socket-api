@@ -26,22 +26,13 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
 
         function send_hokm(hokm) {
             if (window.socket.connected) {
-                window.socket.emit('GAME', {
-                    room_id: room_id,
-                    COM: 'setHokm',
-                    res: {
-                        hokm: hokm
-                    }
-                });
+                window.gameEmitor('setHokm' , { hokm });
                 setHokmDOM.removeClass('show').addClass('hide');
             }
         }
-        const gsme_config = function (mess) {
-            config.setRoom_id(mess.room_id);
-            room_id=mess.room_id;
-            config.setLocation(mess.location);
-        };
+
         const game_start = function (mess) {
+            console.log(mess);
             let location = {};
             loadingPage.errBoxRemove();
             loadingPage.load(false);
@@ -170,7 +161,10 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
             }
         };
         const playerPickCard = function (mess) {
-            let playerLoc=config.getLocOfPlayers({location:mess.location});
+            console.log(mess);
+            let playerLoc=config.getLocOfPlayers({location: mess.location});
+            console.log(playerLoc);
+
             let player=game.run.getPlayers()[playerLoc];
             let cards=player.row.cards;
             let card={};
@@ -240,10 +234,20 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
         };
         const chat = function(mess){
             let playerLoc = config.getLocOfPlayers({location: mess.location});
-            console.log(game)
             game.run.chatPlayer(playerLoc , mess.message)
-        }
-
+        };
+        const player_disconnect = function(mess){
+            let playerLoc = config.getLocOfPlayers({location: mess.location});
+            game.run.chatPlayer(playerLoc , "آفلاین شد");
+            const player = game.run.returnPlayer(playerLoc);
+            player.display.offline(true);
+        };
+        const player_connect = function(mess){
+            let playerLoc = config.getLocOfPlayers({location: mess.location});
+            game.run.chatPlayer(playerLoc , "آنلاین شد");
+            const player = game.run.returnPlayer(playerLoc);
+            player.display.offline(false);
+        };
 
 
         let routers = {
@@ -258,10 +262,12 @@ define(["loadingPage", "../main2", "../config", "../ui", "jquery","../game"],
             'alert': game_alert,
             'teamScore': teamScore,
             'gameEnd': gameEnd,
-            'config':gsme_config,
             'newPlayer': game_newPlayer,
             'leftPlayer': game_leftPlayer,
-            'chat':chat
+            'chat':chat,
+            'player_disconnect':player_disconnect,
+            'player_connect':player_connect
+
         };
         return function (mess) {
             room_id = config.getRoom_id();

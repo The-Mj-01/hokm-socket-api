@@ -101,9 +101,11 @@ define(['config'],function(config){
         chatbar.removeClass('anim');
         void this.chatbar.offsetWidth;
         chatbar.html(mess).addClass('anim');
+    };
 
-
-        
+    PlayerDisplay.prototype.offline = function(mode){
+        const display = $(this.display);
+        mode ? display.addClass('offline') : display.removeClass('offline')
     };
 
 
@@ -146,14 +148,12 @@ define(['config'],function(config){
         const chatsSider = document.createElement('div');
         chatsSider.classList = "chatsSider";
         chats.forEach(chatMess => {
-            let chat = document.createElement('div');
+            const chat = document.createElement('div');
             chat.innerHTML = chatMess;
             chat.className = "chatBox"
-            chat.onclick = function(){
-                window.gameEmitor("chat", {
-                    sender: config.getMyName(),
-                    message: chatMess});
-            }
+            chat.onclick = function() {
+                window.gameEmitor("chat", chatMess);
+            };
             chatsSider.appendChild(chat);
         });
         this.display.appendChild(chatsSider);

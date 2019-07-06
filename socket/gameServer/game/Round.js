@@ -19,8 +19,8 @@ newRound = async function (e) {
 };
 
 onHokmSet = async function (e) {
-    e.teamEmit('newRound', {
-        mode: 'allPlayers', cards: e.cards, hakem: e.hakem
+    await e.teamEmit('newRound', {
+        mode: 'allPlayers', cards: e.cards, hakem: e.hakem.toView()
     });
     await timeout(10000);
 
@@ -30,7 +30,7 @@ onHokmSet = async function (e) {
 onRoundEnd = function (e) {
     let roundWinner;
     if (e.preRoundteamScore.rightL > e.preRoundteamScore.topB){
-        roundWinner='rightL';
+        roundWinner = 'rightL';
         game_CheckCoat(e);
         e.roundteamScore.rightL++;
     }
@@ -50,11 +50,11 @@ onRoundEnd = function (e) {
     function game_CheckCoat(e) {
         if (e.preRoundteamScore.rightL === 0 || e.preRoundteamScore.topB=== 0)
             if (roundWinner === 'topB' || roundWinner === 'rightL')
-                if (e.hakem.location === 'top' || e.hakem.location === 'bottom') {
+                if (e.hakem.location === 2 || e.hakem.location === 0) {
                     if (roundWinner === 'topB') e.roundteamScore.topB++;
                     else if (roundWinner === 'rightL') e.roundteamScore.rightL += 2
                 }
-                else  if (e.hakem.location === 'right' || e.hakem.location === 'left') {
+                else  if (e.hakem.location === 3 || e.hakem.location === 1) {
                     if (roundWinner === 'rightL') e.roundteamScore.rightL++;
                     else if (roundWinner === 'topB') e.roundteamScore.topB += 2
                 }

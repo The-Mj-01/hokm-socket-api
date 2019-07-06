@@ -4,16 +4,16 @@ let ns={};
 ns["/hokm"]="hokm";
 ns["/GlobalHokm"]="globalHokm";
 let nameSpace;
-var socket=null;
+let socket=null;
 let socket_ID=null;
-let serverPort=100;
-let setIntervalTime=8000;
+const serverPort=443;
+const setIntervalTime=15000;
 let lastCOM;
 let evenDisconnected=false;
 let pingTimeStart=null;
 let pinginterval=null;
 let pingResp=true;
-
+let token;
 
 define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket/game_core","config" , "Debug"],
     function(socket_io,$,   loadingPage,       loginPage,          ui      , game_core,      config,    Debug){
@@ -26,7 +26,6 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 let url = new URL(pageURL);
                 this.id=url.searchParams.get('id');
                 this.userName=url.searchParams.get("userName") || "USER";
-                
             }
 
         };
@@ -49,13 +48,11 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
            socket=socketConnect();
 
             window.socket=socket;
-           
-        
 
             socket.on("connect",onConnect);
             socket.on("disconnect",(r)=>{
-                $("#pingTime").html("Disconnected !");
-                evenDisconnected=true;
+                pingTimeDom.html("Disconnected !");
+                evenDisconnected = true;
                 console.log("socket disconnect",r);
                 Debug.log("disconnect")
             });
@@ -66,14 +63,18 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
                 }
 
             });
+            socket.on('config',(mess)=>{
+                console.log('config' , mess);
+                config.setRoom_id(mess.room_id);
+                config.setLocation(mess.location);
+            });
             socket.on('GAME',(mess)=>{
                 if(mess){
                     lastCOM = mess;
                     game_core(mess);
                 }
+                if (mess.mess_ID) socket.emit('_CALLBACK' , mess.mess_ID);
                 Debug.log("GAME" , mess)
-
-
             });
             socket.on('connect_error', (error) => {console.log('connect_error',error)});
             socket.on('error', (error) => {console.log('error',error); Debug.log("socket error" , error);
@@ -98,6 +99,9 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
             socket.on('debug', (m) => {
                 console.log('deb' , m);
                 Debug.log("deb", m)
+            });
+            socket.on('token' , (t) =>{
+                token = t;
             })
         };
         getNameSpace();
@@ -125,23 +129,18 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
 
         function onConnect() {
             Debug.log("connected");
-            console.log("socket Connect");
-            $("#pingTime").html("Connected");
-            if (evenDisconnected && room) {
-                socket.emit('returnRoom',{room , lastCOM});
-            }
-            else loginRoom[nameSpace]();
+            pingTimeDom.html("Connected");
+            if (token) socket.emit('token', token);
+            else if (!evenDisconnected) loginRoom[nameSpace]();
+            else alert("اتصال شما با سرور ناپایدار است.");
 
             window.gameEmitor = function(COM, res){
-                if (!socket.connected) return alert('اتصال شما با سرور قطع شده است')
-                res.location = config.getLocation()
+                if (!socket.connected) return alert('اتصال شما با سرور قطع شده است');
                 window.socket.emit('GAME', {
-                    room_id: config.getRoom_id(),
                     COM,
                     res
-                    
                 });
-            }
+            };
             loadingPage.errBoxRemove();
             if (pinginterval) clearInterval(pinginterval);
              pinginterval = setInterval(ping,setIntervalTime);
@@ -149,11 +148,11 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
         }
         function socketConnect() {
             let pageURL=document.location;
-            socket = socket_io.connect(pageURL.host+`:${serverPort}/${nameSpace}`, {
+            socket = socket_io(pageURL.host+`:${serverPort}/${nameSpace}`, {
                 reconnection: true,
                 reconnectionDelay: 200,
                 reconnectionDelayMax : 1000,
-                transports: ['websocket'],
+                transports: ['websocket']
             });
             socket.heartbeatTimeout = 20000;
             return socket
@@ -167,7 +166,7 @@ define(["socket_io","jquery","loadingPage","./socket/loginPage","./ui","./socket
         function updatePingDom(ping){
             pingTimeDom.html(ping);
         }
-        $("#pingTime").on('click' ,() => {
+        pingTimeDom.on('click' ,() => {
             window.socket.emit("debug");
             Debug.show()
 
