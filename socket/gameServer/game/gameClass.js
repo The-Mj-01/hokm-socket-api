@@ -105,7 +105,6 @@ Game.prototype.addplayer = function(scoket ,location , playerData) {
 // };
 Game.prototype.teamEmit = function(COM , res , withoutCB){
     return Promise.all(this.players.toArray().map(p => p.send(COM , res , withoutCB)))
-        .timeout(60 * 1000)
 };
 Game.prototype.run=function(status){
     if (status) this.status = status;
