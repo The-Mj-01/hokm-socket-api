@@ -1,5 +1,4 @@
 import layout from './layout'
-import game from './game'
 import sendCard from './game_sendCard'
 
 var Row = function (id, player) {
@@ -70,7 +69,7 @@ Row.prototype.getPosFor = function (ind, card) {
 
 Row.prototype.sort = function () {
     this.cards.sort(function (a, b) {
-        if (a.suit != b.suit) return b.suit - a.suit;
+        if (a.suit !== b.suit) return b.suit - a.suit;
         return a.num - b.num;
     }).forEach(function (v, ind) {
         v.ind = ind;

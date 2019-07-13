@@ -92,7 +92,11 @@ Player.prototype.send = function (COM , res , withoutCallback) {
         this.events.on(`messID_${mess_ID}` , () => {
             clearInterval(sendInterval);
             resolve();
-        })
+        });
+        setTimeout(() => {
+            clearInterval(sendInterval);
+            resolve()
+        }, 60 * 1000);
 
   }))
 };

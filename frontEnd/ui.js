@@ -20,7 +20,7 @@
     document.body.appendChild(moveMessage);
 
     function moveMess() {
-        let jdim=$(".msgMove");
+        const jdim=$(".msgMove");
             jdim.removeClass('anim');
             void moveMessage.offsetWidth;
             jdim.addClass('anim');

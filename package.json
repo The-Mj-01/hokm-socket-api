@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nodemon index.js ",
-    "start": "forever start index.js"
+    "dev": "node index.js ",
+    "start": "pm2 start index.js",
+    "comp": "gulp js"
   },
   "author": "ERFANIUM",
   "license": "ISC",
