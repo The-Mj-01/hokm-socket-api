@@ -106,7 +106,7 @@ Player.prototype.send = function (COM , res , withoutCallback) {
 const setEvents = (socket , events , game) => {
     socket.on('GAME' , (mess) => {
         const { COM , res } = mess;
-        console.log(`PLAYER: ${game.name} | ${game.location} | ${COM} | ${res}`.green);
+        console.log(`PLAYER: ${game.name} | ${game.location} | ${COM} | ${JSON.stringify(res)}`.green);
         events.emit(COM , res);
         events.emit('update');
     });
