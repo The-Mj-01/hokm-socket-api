@@ -105,7 +105,7 @@ Game.prototype.addplayer = function(scoket ,location , playerData) {
 //     });
 // };
 Game.prototype.teamEmit = function(COM , res , withoutCB){
-    console.log(`TEAM ${COM} | ${JSON.stringify(res)}`.red);
+    console.log(`TEAM ${COM} | ${JSON.stringify(res)}`.white);
 
     return Promise.all(this.players.toArray().map(p => p.send(COM , res , withoutCB))).then(() => {
         console.log('done'.bgGreen)

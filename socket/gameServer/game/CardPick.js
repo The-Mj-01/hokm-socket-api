@@ -7,6 +7,7 @@ async function emit(e, mess, location) {
 
 
 async function run(e, res, location) {
+    console.log('P');
 
     async function add() {
         e.preRoundGame[e.roundNum].card = res.card;
@@ -19,8 +20,12 @@ async function run(e, res, location) {
         res.card.hasSuit = true;
         await add();
     } else {
-        if (res.card.suit * 1 === e.suit * 1) await add();
+        if (res.card.suit === e.suit) await add();
         else if (res.card.hasSuit === false) await add();
+        else {
+            console.log("WTF 1".yellow);
+            console.log(JSON.stringify(res));
+        }
     }
 }
 

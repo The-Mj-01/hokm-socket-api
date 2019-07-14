@@ -5,15 +5,15 @@ const Round = require("./Round");
 
 async function nextPlayer(e){
     const player = e.preRoundGame[e.roundNum];
+    player.events.once('pickCard' , ( card ) => {
+        e._pickCard(card , player.location , player)
+    });
     await e.teamEmit('setTurn',{
         player : player.toView(),
         zamine : e.zamine,
         suit   : e.suit
     });
 
-    player.events.once('pickCard' , ( card ) => {
-        e._pickCard(card , player.location , player)
-    })
 
 }
 newPreRound = async function(e , _starter){
