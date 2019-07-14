@@ -20,16 +20,6 @@ const NTS = {
     3: "right",
 };
 
-function toName(number) {
-    if (typeof number === 'number') return NTS[number];
-    else return number
-}
-
-function toNum(name) {
-    if (typeof name === 'string') return STN[name];
-    else return name
-}
-
 export default {
     setMyName: function (name) {
         myName = name
@@ -46,8 +36,6 @@ export default {
           localStorage.setItem("levels", JSON.stringify(levels));*/
     },
     setLocation: function (l) {
-        l = toName(l);
-        console.log('set', l)
         location = l;
     },
     getLocation: function () {
@@ -57,37 +45,34 @@ export default {
         let me;
         let others = [];
         array.forEach((player) => {
-            player.location = toName(player.location);
-            if (player.location === toName(location)) me = player;
+            if (player.location === location) me = player;
             else others.push(player);
         });
         return {me, others};
     },
     getLocOfPlayers: function (player) {
-        player.location = toName(player.location);
-        if (player) {
-            if (location === 'bottom') {
-                if (player.location === 'bottom') return 0;
-                if (player.location === 'left') return 1;
-                if (player.location === 'right') return 3;
-                if (player.location === 'top') return 2;
-            } else if (location === 'left') {
-                if (player.location === 'bottom') return 3;
-                if (player.location === 'left') return 0;
-                if (player.location === 'right') return 2;
-                if (player.location === 'top') return 1;
-            } else if (location === 'right') {
-                if (player.location === 'bottom') return 1;
-                if (player.location === 'left') return 2;
-                if (player.location === 'right') return 0;
-                if (player.location === 'top') return 3;
-            } else if (location === 'top') {
-                if (player.location === 'bottom') return 2;
-                if (player.location === 'left') return 3;
-                if (player.location === 'right') return 1;
-                if (player.location === 'top') return 0;
+            if (location === 0) {
+                if (player.location === 0) return 0;
+                if (player.location === 1) return 1;
+                if (player.location === 3) return 3;
+                if (player.location === 2) return 2;
+            } else if (location === 1) {
+                if (player.location === 0) return 3;
+                if (player.location === 1) return 0;
+                if (player.location === 3) return 2;
+                if (player.location === 2) return 1;
+            } else if (location === 3) {
+                if (player.location === 0) return 1;
+                if (player.location === 1) return 2;
+                if (player.location === 3) return 0;
+                if (player.location === 2) return 3;
+            } else if (location === 2) {
+                if (player.location === 0) return 2;
+                if (player.location === 1) return 3;
+                if (player.location === 3) return 1;
+                if (player.location === 2) return 0;
             }
-        }
+
     },
     getPlayersSaved: function () {
         return players;

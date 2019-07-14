@@ -6,9 +6,7 @@ function  getCardsToSetHakem(e) {
     const players = e.players;
     let bored = borCard();
     for (let i = 0; i < bored.length; i++) {
-        if (bored[i] === 12 || bored[i] === 25 || bored[i] === 38 || bored[i] === 51) {
-            return {bored,i,players};
-        }
+        if (bored[i] === 12 || bored[i] === 25 || bored[i] === 38 || bored[i] === 51) return {bored,i,players};
     }
 }
 
@@ -23,10 +21,10 @@ async function run(e) {
 
    } else {
        if (e.preRoundteamScore.rightL > e.preRoundteamScore.topB){
-           if (e.hakem.location ==='top' || e.hakem.location ==='bottom') await setNewHakem(e)
+           if (e.hakem.location === 2 || e.hakem.location === 0) await setNewHakem(e)
        }
        else if (e.preRoundteamScore.rightL < e.preRoundteamScore.topB){
-           if (e.hakem.location ==='right' || e.hakem.location ==='left') await setNewHakem(e)
+           if (e.hakem.location === 3 || e.hakem.location === 1) await setNewHakem(e)
        }
    }
 

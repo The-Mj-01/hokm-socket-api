@@ -44,10 +44,10 @@ const game_start = function (mess) {
     loadingPage.load(false);
     let players = config.getPlayers(mess);
     location = players.me.location;
-    if (location === 'bottom') config.setNames([players.me.name, players.others[0].name, players.others[1].name, players.others[2].name]);
-    if (location === 'left') config.setNames([players.me.name, players.others[1].name, players.others[2].name, players.others[0].name]);
-    if (location === 'right') config.setNames([players.me.name, players.others[0].name, players.others[1].name, players.others[2].name]);
-    if (location === 'top') config.setNames([players.me.name, players.others[2].name, players.others[0].name, players.others[1].name]);
+    if (location === 0) config.setNames([players.me.name, players.others[0].name, players.others[1].name, players.others[2].name]);
+    if (location === 1) config.setNames([players.me.name, players.others[1].name, players.others[2].name, players.others[0].name]);
+    if (location === 3) config.setNames([players.me.name, players.others[0].name, players.others[1].name, players.others[2].name]);
+    if (location === 2) config.setNames([players.me.name, players.others[2].name, players.others[0].name, players.others[1].name]);
     main()
 
 };
@@ -170,9 +170,7 @@ const game_setTurn = function (mess) {
     }
 };
 const playerPickCard = function (mess) {
-    console.log(mess);
     let playerLoc = config.getLocOfPlayers({location: mess.location});
-    console.log(playerLoc);
 
     let player = game.run.getPlayers()[playerLoc];
     let cards = player.row.cards;
@@ -203,8 +201,8 @@ function deskMove(x) {
 
 const teamScore = function (mess) {
     function getOurTeam(loc) {
-        if (loc === 'top' || loc === 'bottom') return {our: "topB", their: "rightL"};
-        else if (loc === 'right' || loc === 'left') return {our: "rightL", their: "topB"};
+        if (loc === 2 || loc === 0) return {our: "topB", their: "rightL"};
+        else if (loc === 3 || loc === 1) return {our: "rightL", their: "topB"};
     }
 
     function roundPrint(our, their) {

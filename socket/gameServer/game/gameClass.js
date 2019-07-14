@@ -105,7 +105,11 @@ Game.prototype.addplayer = function(scoket ,location , playerData) {
 //     });
 // };
 Game.prototype.teamEmit = function(COM , res , withoutCB){
-    return Promise.all(this.players.toArray().map(p => p.send(COM , res , withoutCB)))
+    console.log(`TEAM ${COM} | ${JSON.stringify(res)}`.red);
+
+    return Promise.all(this.players.toArray().map(p => p.send(COM , res , withoutCB))).then(() => {
+        console.log('done'.bgGreen)
+    })
 };
 Game.prototype.run=function(status){
     if (status) this.status = status;

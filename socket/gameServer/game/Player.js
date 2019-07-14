@@ -3,6 +3,7 @@ const EventEmitter = require('events');
 const auth = require('../auth');
 const Promise = require('bluebird');
 const crypto = require("crypto");
+const c = require('colors');
 Player = function (scoket , location , Game ,name , tgID) {
     this.Game = Game;
     this.name = name;
@@ -70,6 +71,7 @@ Player.prototype.toView = function () {
     return {
         name: this.name,
         location: this.location,
+        tg_id: this.tg_id ? this.tg_id : undefined
     }
 };
 
@@ -101,9 +103,10 @@ Player.prototype.send = function (COM , res , withoutCallback) {
   }))
 };
 
-const setEvents = (socket , events) => {
+const setEvents = (socket , events , game) => {
     socket.on('GAME' , (mess) => {
         const { COM , res } = mess;
+        console.log(`PLAYER: ${game.name} | ${game.location} | ${COM} | ${res}`.green);
         events.emit(COM , res);
         events.emit('update');
     });

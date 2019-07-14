@@ -11,7 +11,6 @@ async function run(e, res, location) {
     async function add() {
         e.preRoundGame[e.roundNum].card = res.card;
         await emit(e, res, location);
-        console.log("ALL P")
         onPlayerPick(e)
     }
 

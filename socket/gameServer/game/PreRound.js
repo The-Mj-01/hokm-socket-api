@@ -12,14 +12,14 @@ async function nextPlayer(e){
     });
 
     player.events.once('pickCard' , ( card ) => {
-        e._pickCard(card , player.location)
+        e._pickCard(card , player.location , player)
     })
 
 }
 newPreRound = async function(e , _starter){
     e.zamine = 'notSet';
     e.suit = 'notSet';
-    if (_starter) e.roundNum = 0;
+    e.roundNum = 0;
     const starter = _starter || e.preRoundStarter;
     const players = e.players;
     const first = starter.location;
@@ -32,7 +32,7 @@ newPreRound = async function(e , _starter){
         players[third],
         players[fourth]
     ];
-    await nextPlayer(e , e.hakem);
+    await nextPlayer(e);
 };
 
 onPlayerPick = async function(e) {

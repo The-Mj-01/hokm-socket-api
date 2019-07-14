@@ -76,12 +76,12 @@ const connectTOS = function (CB) {
         config.setLocation(mess.location);
     });
     socket.on('GAME', (mess) => {
-        if (mess) {
-            lastCOM = mess;
-            game_core(mess);
-        }
+        console.log(mess);
+        lastCOM = mess;
+        game_core(mess);
         if (mess.mess_ID) socket.emit('_CALLBACK', mess.mess_ID);
         Debug.log("GAME", mess)
+
     });
     socket.on('connect_error', (error) => {
         console.log('connect_error', error)
@@ -158,10 +158,9 @@ function onConnect() {
     if (token) socket.emit('token', token);
     else if (!evenDisconnected) loginRoom[nameSpace]();
     else alert("اتصال شما با سرور ناپایدار است.");
-
     window.gameEmitor = function (COM, res) {
         if (!socket.connected) return alert('اتصال شما با سرور قطع شده است');
-        window.socket.emit('GAME', {
+        socket.emit('GAME', {
             COM,
             res
         });
