@@ -1,6 +1,5 @@
-let borCard=require('./shuffleDeck');
-let setHokm=require('./heyHakemSetHokm');
-
+const borCard = require('./shuffleDeck');
+const { nextof } = require('./Location');
 
 function  getCardsToSetHakem(e) {
     const players = e.players;
@@ -32,7 +31,7 @@ async function run(e) {
 
 }
 async function setNewHakem(e){
-    const hakemLoc = e.nextOf(e.hakem,1);
+    const hakemLoc = nextof(e.hakem,1);
     e.hakem = e.players[hakemLoc];
     await e.teamEmit('setHakem', {
         roundOne:false, hakem: e.hakem.toView(),
