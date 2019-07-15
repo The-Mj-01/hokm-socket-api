@@ -133,7 +133,6 @@ Player.prototype.addQueue = function (COM , res) {
 
 };
 Player.prototype.checkQueue = function () {
-    console.log(this.messQueue);
     if (this.messQueue.length > 0){
         const mess_ID = this.messQueue[0];
         this.events.emit(`_exec${mess_ID}`)
