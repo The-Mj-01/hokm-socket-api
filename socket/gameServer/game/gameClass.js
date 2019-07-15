@@ -106,10 +106,13 @@ Game.prototype.addplayer = function(scoket ,location , playerData) {
 // };
 Game.prototype.teamEmit = function(COM , res , withoutCB){
     console.log(`TEAM ${COM} | ${JSON.stringify(res)}`.white);
+    const Players = this.players.toArray();
+    if (withoutCB){
+        Players.map(p => p.send(COM , res , withoutCB));
+    }
+    else Players.map(p => p.addQueue(COM , res));
 
-    return Promise.all(this.players.toArray().map(p => p.send(COM , res , withoutCB))).then(() => {
-        console.log('done'.bgGreen)
-    })
+
 };
 Game.prototype.run=function(status){
     if (status) this.status = status;
@@ -165,15 +168,6 @@ Game.prototype.getRoundPlayed=function(){
 };
 
 
-Game.prototype.nextOf=function(player,x){  // todo: remove
-  let a={bottom:0,left:1,top:2,right:3};
-  let b=a[player.location]+x;
-    if (b===4)b=0;
-    if (b===5)b=1;
-    if (b===6)b=2;
-    if (b===7)b=3;
-    return b
-};
 
 Game.prototype.setUpdate=function(){
     self=this;

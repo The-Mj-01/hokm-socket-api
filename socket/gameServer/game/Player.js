@@ -4,15 +4,19 @@ const auth = require('../auth');
 const Promise = require('bluebird');
 const crypto = require("crypto");
 const c = require('colors');
+const mess_ID_Gen = () => crypto.randomBytes(5).toString('hex');
 Player = function (scoket , location , Game ,name , tgID) {
     this.Game = Game;
     this.name = name;
     this.tgID = tgID;
+    this.gameType = 'Global';
     this.location = toNum(location);
     this.events = new EventEmitter();
     this.on = this.events.on;
     this.once = this.events.once;
     this.isOnline = true;
+    this.messQueue = [];
+    this.isWaitingForCB = false;
     this.setGameEvents();
 
 
@@ -83,24 +87,57 @@ Player.prototype.sendToken = function () {
     this.socket.emit('token' , token)
 };
 
-Player.prototype.send = function (COM , res , withoutCallback) {
-    const mess_ID = crypto.randomBytes(5).toString('hex');
+Player.prototype.send = function (COM , res , withoutCallback , mess_ID) {
+    if (!mess_ID) mess_ID = mess_ID_Gen();
     const mess = withoutCallback ? { COM , res } : { COM , res , mess_ID };
     const send = () => this.socket.emit('GAME' , mess);
     send();
     if (withoutCallback) return;
-    return new Promise((resolve => {
+    this.isWaitingForCB = true;
+    return new Promise((resolve , reject) => {
         const sendInterval = setInterval(send , 5000);
-        this.events.on(`messID_${mess_ID}` , () => {
+        this.events.once(`messID_${mess_ID}` , () => {
             clearInterval(sendInterval);
+            this.isWaitingForCB = false;
             resolve();
         });
         setTimeout(() => {
             clearInterval(sendInterval);
-            resolve()
+            reject()
         }, 60 * 1000);
 
-  }))
+  });
+};
+
+Player.prototype.addQueue = function (COM , res) {
+    function deleteMess(mess_ID){
+        Player.messQueue =  Player.messQueue.filter((m) => m !== mess_ID )
+    }
+
+    const Player = this;
+    const mess_ID = mess_ID_Gen();
+    this.messQueue.push(mess_ID);
+    Player.events.once(`_exec${mess_ID}` , () => {
+        Player.send(COM , res , false , mess_ID)
+            .then(() => {
+                deleteMess(mess_ID);
+                Player.checkQueue();
+            })
+            .catch(e => {
+                deleteMess(mess_ID);
+                Player.checkQueue();
+                console.log("err while sending ")
+            })
+    });
+    if (!this.isWaitingForCB) Player.checkQueue();
+
+};
+Player.prototype.checkQueue = function () {
+    console.log(this.messQueue);
+    if (this.messQueue.length > 0){
+        const mess_ID = this.messQueue[0];
+        this.events.emit(`_exec${mess_ID}`)
+    }
 };
 
 const setEvents = (socket , events , game) => {

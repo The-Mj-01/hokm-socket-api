@@ -25,7 +25,7 @@ function run(e, mode, forceEndPlayer) {
         e.teamEmit("gameEnd", true , true);
         if (forceEndPlayer){
             e.teamEmit("alert", forceEndPlayer + " بازی را ترک کرد");
-            dataX = post_forceEndGame(e, forceEndPlayer);
+            dataX = post_forceEndGame(e, forceEndPlayer , playerData);
         }
 
         removeGame(e.room_id , playerData);
@@ -33,10 +33,13 @@ function run(e, mode, forceEndPlayer) {
     } else if (mode === 2) {
         e.teamEmit("alert", "بازی به علت غیرفعال بودن بازیکنان، تمام شد.");
         e.teamEmit("gameEnd", true , true);
-        dataX = post_gameIsClose(e);
+        dataX = post_gameIsClose(e , playerData);
         removeGame(e.room_id , playerData);
     }
-    if (dataX) apiReq.post(url, dataX, (data) => {});
+    console.log(`to host: ${JSON.stringify(dataX)}`);
+    apiReq.post(url, dataX, (data) => {
+        //console.log(data);
+    });
 
     clearFromDb(e);
 }
@@ -45,7 +48,7 @@ function post_endGame(e , PD) {
     return {
         mode: 0,
         gameType:e.gameType,
-        room_id: e.room_id,
+        room_id: e.Game,
         players: PD,
         teamScore: e.roundteamScore
     };
@@ -54,14 +57,14 @@ function post_endGame(e , PD) {
 
 }
 
-function post_forceEndGame(e, forceEndPlayer) {
+function post_forceEndGame(e, forceEndPlayer , PD) {
     if (forceEndPlayer) {
         return {
             mode: 1,
             gameType:e.gameType,
             forceEndPlayer: forceEndPlayer,
-            room_id: e.room_id,
-            players: e.players,
+            room_id: e.Game,
+            players: PD,
             teamScore: e.roundteamScore
         }
 
@@ -69,12 +72,12 @@ function post_forceEndGame(e, forceEndPlayer) {
 
 }
 
-function post_gameIsClose(e) {
+function post_gameIsClose(e , PD) {
     return {
         mode: 2,
         gameType:e.gameType,
-        room_id: e.room_id,
-        players: e.players,
+        room_id: e.Game,
+        players: PD,
         teamScore: e.roundteamScore
     };
 
@@ -108,7 +111,10 @@ daleteBadPlayersData=function(e){
             });
         }
     });
-    return p;
+    return e.players.toArray().map(p => {
+        const { name , location ,  tgID} = p;
+        return { name , location , tgID }
+    });
 };
 module.exports = run;
 
