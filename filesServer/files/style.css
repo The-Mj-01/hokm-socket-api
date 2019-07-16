@@ -94,6 +94,12 @@ html, body {
     font-family: Arial;
 }
 
+#game_view{
+    display: block;
+    overflow: hidden;
+    position: fixed;
+    transform-origin: 0 0;
+}
 td[contentEditable] {
     -webkit-user-select: text;
     -moz-user-select: text;
@@ -113,7 +119,7 @@ td[contentEditable] {
 }
 
 #loading_page {
-    z-index: 998;
+    z-index: 100;
     background-color: #555;
     display: flex;
     align-items: center;

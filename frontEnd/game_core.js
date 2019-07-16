@@ -174,10 +174,7 @@ const playerPickCard = function (mess) {
 
     let player = game.run.getPlayers()[playerLoc];
     let cards = player.row.cards;
-    let card = {};
-    cards.forEach((e) => {
-        if (e.id * 1 === mess.card.id * 1) card = e
-    });
+    const [card] = cards.filter(c => c.id === mess.card.id);
     if (card) {
         let x = config.getWasteCards();
         x.push(cards);

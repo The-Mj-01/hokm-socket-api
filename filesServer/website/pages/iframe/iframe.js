@@ -1,9 +1,9 @@
 const path = require('path');
+const hokmPage = require("../hokm/hokm");
+
 
 ind = function (app , route) {
-    app.get(route , (req , res) =>{
-        res.sendFile(path.join(__dirname + '/iframe.html'))
-    });
+    app.get(route , hokmPage.servPage)
 };
 
 exports.ind = ind;

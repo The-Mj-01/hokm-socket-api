@@ -10,7 +10,7 @@ import Debug from './Debug'
 let room;
 let ns = {};
 ns["/hokm"] = "hokm";
-ns["/GlobalHokm"] = "globalHokm";
+ns["/IGHokm"] = "globalHokm";
 let nameSpace;
 let socket = null;
 let socket_ID = null;

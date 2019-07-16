@@ -167,7 +167,7 @@ export default {
     },
     createChatDesk: function () {
         const cd = new ChatDesk();
-        document.body.appendChild(cd.display);
+        frag.appendChild(cd.display);
     },
     createPlayerDisplay: function (id, name) {
         return new PlayerDisplay(id, name);
