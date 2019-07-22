@@ -45,7 +45,16 @@ CardDisplay.prototype.setSelectable = function (yes) {
     if (yes) {
         this.dom.addClass("movable");
     } else {
-        this.dom.removeClass("movable");
+        this.dom.removeClass("movable")
+    }
+};
+
+CardDisplay.prototype.grayScale = function (yes) {
+    if (yes) {
+        this.dom.addClass("grayScale");
+        this.dom.css({zIndex: "unset"});
+    } else {
+        this.dom.removeClass("grayScale");
     }
 };
 

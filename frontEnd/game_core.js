@@ -154,14 +154,18 @@ const game_setTurn = function (mess) {
             } else {
                 let i = 0;
                 yourCard.forEach((card) => {
-                    if (card.suit * 1 === suit * 1) {
+                    if (card.suit  === suit ) {
                         card.display.setSelectable(true);
                         i++
                     }
+                    else card.display.grayScale(true);
                 });
                 if (i === 0) {
                     yourCard.forEach((card) => {
-                        card.display.setSelectable(true)
+                        card.display.setSelectable(true);
+                        card.display.grayScale(false);
+                        card.adjustPos();
+
                     });
                 }
             }

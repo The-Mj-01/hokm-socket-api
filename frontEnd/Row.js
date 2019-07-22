@@ -86,7 +86,7 @@ Row.prototype.addShift = function (nc) {
     // if(this.curShifted.length === this.maxShift){
     //     this.playedBy.rowSelected(this.maxShift);
     // }
-    // this.adjustPos();
+    this.adjustPos();
 };
 
 Row.prototype.out = function (card) {

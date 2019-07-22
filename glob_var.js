@@ -2,7 +2,7 @@ const data={
     app: {
         ports:{
             socket:443,
-            files: 80,
+            files: 3000,
         },
         hook_url:"http://vippanel.cf/telegram/callback.php"
     },

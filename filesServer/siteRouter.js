@@ -1,7 +1,6 @@
 const  siteRoutes = {};
 const P404 = require('./website/pages/404/404');
 siteRoutes['/hokm'] = require("./website/pages/hokm/hokm").ind;
-siteRoutes['/GlobalHokm'] = require("./website/pages/globalHokm/ghokm").ind;
 siteRoutes['/pingTest'] = require("./website/pages/pingTest/pingTest").ind;
 siteRoutes['/IGHokm'] = require("./website/pages/iframe/iframe").ind;
 
