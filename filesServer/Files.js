@@ -17,5 +17,6 @@ module.exports = () => {
     httpServer.listen(port,()=>{
         console.log('httpServer RUNNING');
     });
+    return httpServer;
 };
 

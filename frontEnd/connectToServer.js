@@ -14,7 +14,7 @@ ns["/IGHokm"] = "globalHokm";
 let nameSpace;
 let socket = null;
 let socket_ID = null;
-const serverPort = 443;
+//const serverPort = 443;
 const setIntervalTime = 15000;
 let lastCOM;
 let evenDisconnected = false;
@@ -173,7 +173,7 @@ function onConnect() {
 
 function socketConnect() {
     let pageURL = document.location;
-    socket = socket_io(pageURL.host + `:${serverPort}/${nameSpace}`, {
+    socket = socket_io(pageURL.host + `/${nameSpace}`, {
         reconnection: true,
         reconnectionDelay: 200,
         reconnectionDelayMax: 1000,

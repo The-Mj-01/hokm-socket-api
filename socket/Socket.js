@@ -3,10 +3,11 @@ const port = require('../glob_var').app.ports.socket;
 const io = require('./io');
 const db = require('./gameServer/database');
 
-module.exports = () => {
+module.exports = (server) => {
+    const socket = io(server);
+
     db.newDB();
-    namespaces.addNS(io);
-    io.listen(port,{'pingTimeout':4000, 'pingInterval':2000});
+    namespaces.addNS(socket);
 
     console.log('Socket RUNNING')
 };

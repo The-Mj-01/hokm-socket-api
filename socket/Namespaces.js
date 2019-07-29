@@ -3,9 +3,9 @@ const    M_globalRoom = require('./gameServer/globalRoom');
 const    M_loginRoomStart = require('./gameServer/loginRoomStart');
 const    M_loginRoom = require('./gameServer/loginRoom');
 const    GameHookRouter = require('./gameServer/gamesManager').route;
-const    io = require('./io');
 const    myDebug = require('./myDebug');
 const auth = require('./gameServer/auth');
+let io;
 
 
 
@@ -18,7 +18,8 @@ getNameSpaces = function(NSs){
     return returnNSpaces
 };
 
-addNS=function() {
+addNS=function(_io) {
+    io = _io;
     const {hokm , globalHokm , pingTest} = getNameSpaces(nameSpaces);
 
     pingTest.on('connection', client => {
