@@ -1,8 +1,8 @@
-const data={
+module.exports= {
     app: {
         ports:{
-            socket:443,
-            files: 3000,
+            socket: 3001,
+            files: process.env.PORT || 3000,
         },
         hook_url:"http://vippanel.cf/telegram/callback.php"
     },
@@ -10,4 +10,3 @@ const data={
         globalRounds: 3
     }
 };
-module.exports=data;
