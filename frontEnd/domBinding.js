@@ -35,24 +35,30 @@ CardDisplay.prototype.adjustPos = function (pos) {
     if (!pos.rotateY) {
         pos.rotateY = 0;
     }
+    const zIndex = 10 + pos.z;
     this.dom.css({
-        zIndex: 10 + pos.z,
+        zIndex,
         transform: 'rotate(' + pos.rotation + 'deg) translate3d(' + pos.x + 'px, ' + pos.y + 'px, ' + pos.z + 'px) rotateY(' + pos.rotateY + 'deg)'
     });
+    this.zIndex = zIndex;
+
 };
 
 CardDisplay.prototype.setSelectable = function (yes) {
     if (yes) {
         this.dom.addClass("movable");
+        this.dom.css({
+            zIndex: self.zIndex + 20
+        });
     } else {
         this.dom.removeClass("movable")
     }
 };
 
 CardDisplay.prototype.grayScale = function (yes) {
+    const self = this;
     if (yes) {
         this.dom.addClass("grayScale");
-        this.dom.css({zIndex: "unset"});
     } else {
         this.dom.removeClass("grayScale");
     }
