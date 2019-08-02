@@ -1,10 +1,18 @@
-const files = ['./files/img/carp.jpg', './files/img/club.png' , './files/img/crown.png' , './files/img/diamond.png' ,'./files/img/flip.png' ,'./files/img/heart.png' , './files/img/card/0.png', './files/img/card/1.png', './files/img/card/2.png', './files/img/card/3.png']
+const files = ['./files/img/carp.jpg', './files/img/club.png' , './files/img/crown.png' , './files/img/diamond.png' ,'./files/img/flip.png' ,'./files/img/heart.png' , './files/img/card/0.png', './files/img/card/1.png', './files/img/card/2.png', './files/img/card/3.png'];
+let filesLoaded = 0;
+const progressBar = $('#progress_bar');
+const fileOnload = () => {
+    filesLoaded ++;
+    const persent = Math.floor(((files.length) / filesLoaded) * 100);
+    progressBar.css('width', `${persent}%`)
+};
 export default () => {
     return Promise.all(files.map(f => {
         return new Promise(resolve => {
             const newImg = new Image;
             newImg.onload = function() {
                 console.log(`${f} loaded`);
+                fileOnload();
                 resolve()
             };
             newImg.src = f;

@@ -151,6 +151,23 @@ td[contentEditable] {
     visibility: hidden;
 }
 
+.progress_bar {
+    height: 6px;
+}
+.progress_bar.border {
+    margin: 20px 0;
+    width: 200px;
+    background-color: #333;
+    position: absolute;
+}
+.progress_bar.grey {
+    background-color: #fff;
+    position: absolute;
+}
+.progress_bar.hide{
+    display: none;
+}
+
 .err_box {
     position: absolute;
     display: block;
