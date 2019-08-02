@@ -3,7 +3,7 @@ let filesLoaded = 0;
 const progressBar = $('#progress_bar');
 const fileOnload = () => {
     filesLoaded ++;
-    const persent = Math.floor(((files.length) / filesLoaded) * 100);
+    const persent = Math.floor((filesLoaded / files.length) * 100);
     progressBar.css('width', `${persent}%`)
 };
 export default () => {
