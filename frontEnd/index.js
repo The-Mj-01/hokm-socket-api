@@ -6,7 +6,10 @@ import ui from "./ui";
 ui.fragmentToDom($('#game-region')[0]);
 FixPageResponsive();
 filesLoader()
-    .then(connectToServer());
+    .then(() => {
+       console.log('load complete');
+       connectToServer()
+    });
 
 
 
