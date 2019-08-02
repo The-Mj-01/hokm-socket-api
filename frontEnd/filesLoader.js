@@ -4,14 +4,15 @@ const progressBar = $('#progress_bar');
 const fileOnload = () => {
     filesLoaded ++;
     const persent = Math.floor((filesLoaded / files.length) * 100);
-    progressBar.css('width', `${persent}%`)
+    progressBar.css('width', `${persent}%`);
+    if (filesLoaded === files.length) $('.progress_bar').addClass('hide');
 };
+
 export default () => {
     return Promise.all(files.map(f => {
         return new Promise(resolve => {
             const newImg = new Image;
             newImg.onload = function() {
-                console.log(`${f} loaded`);
                 fileOnload();
                 resolve()
             };
