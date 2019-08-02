@@ -95,17 +95,20 @@ Player.prototype.send = function (COM , res , withoutCallback , mess_ID) {
     if (withoutCallback) return;
     this.isWaitingForCB = true;
     return new Promise((resolve , reject) => {
-        const sendInterval = setInterval(send , 5000);
+        let bar = 0;
+        const sendInterval = setInterval(() => {
+            bar++;
+            if (bar > 10){
+                return reject('client is offline')
+            }
+            console.log('bad socket connection');
+            send()
+        } , 5000);
         this.events.once(`messID_${mess_ID}` , () => {
             clearInterval(sendInterval);
             this.isWaitingForCB = false;
             resolve();
         });
-        setTimeout(() => {
-            clearInterval(sendInterval);
-            reject()
-        }, 60 * 1000);
-
   });
 };
 
@@ -124,9 +127,9 @@ Player.prototype.addQueue = function (COM , res) {
                 Player.checkQueue();
             })
             .catch(e => {
+                console.log("err while sending ");
                 deleteMess(mess_ID);
                 Player.checkQueue();
-                console.log("err while sending ")
             })
     });
     if (!this.isWaitingForCB) Player.checkQueue();

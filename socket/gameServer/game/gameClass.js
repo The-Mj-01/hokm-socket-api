@@ -6,7 +6,6 @@ const io = require('../../io');
 const myDebuger = require('../../myDebug');
 const chat = require('./chat');
 const { toNum } = require('./Location');
-const Promise = require('bluebird');
 
 
 
@@ -195,7 +194,7 @@ Game.prototype.getEmptyLocations=function () {
 function checkUpdateTime(self){
     self.newTime = new Date().getTime();
     let delta = self.newTime - self.oldTime;
-    if (delta > (5*60*1000) && this._isGameStarted){
+    if (delta > (5*60* 1000) && this._isGameStarted){
      endGame(self,2)
     }
 }
