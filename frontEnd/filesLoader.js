@@ -4,6 +4,7 @@ export default () => {
         return new Promise(resolve => {
             const newImg = new Image;
             newImg.onload = function() {
+                console.log(`${f} loaded`);
                 resolve()
             };
             newImg.src = f;

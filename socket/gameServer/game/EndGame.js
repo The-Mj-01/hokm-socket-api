@@ -19,7 +19,6 @@ function run(e, mode, forceEndPlayer) {
     if (mode === 0) {
         e.teamEmit("gameEnd", true , true);
         dataX = post_endGame(e , playerData);
-        removeGame(e.room_id);
 
     } else if (mode === 1) {
         e.teamEmit("gameEnd", true , true);
@@ -28,13 +27,11 @@ function run(e, mode, forceEndPlayer) {
             dataX = post_forceEndGame(e, forceEndPlayer , playerData);
         }
 
-        removeGame(e.room_id , playerData);
 
     } else if (mode === 2) {
         e.teamEmit("alert", "بازی به علت غیرفعال بودن بازیکنان، تمام شد.");
         e.teamEmit("gameEnd", true , true);
         dataX = post_gameIsClose(e , playerData);
-        removeGame(e.room_id , playerData);
     }
     console.log(`to host: ${JSON.stringify(dataX)}`);
     apiReq.post(url, dataX, (data) => {
@@ -42,6 +39,8 @@ function run(e, mode, forceEndPlayer) {
     });
 
     clearFromDb(e);
+    removeGame(e.room_id);
+
 }
 
 function post_endGame(e , PD) {
