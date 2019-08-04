@@ -147,6 +147,7 @@ Game.prototype._joinOfflinePlayer = function (socket) {
 };
 
 Game.prototype._forceEndGame = function (player) {
+
    endGame(this, 1, player.name)
 };
 Game.prototype._pickCard = function (card, location) {

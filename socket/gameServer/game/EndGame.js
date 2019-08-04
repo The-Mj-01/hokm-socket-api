@@ -21,15 +21,9 @@ function run(e, mode, forceEndPlayer) {
         dataX = post_endGame(e , playerData);
 
     } else if (mode === 1) {
-        e.teamEmit("gameEnd", true , true);
-        if (forceEndPlayer){
-            e.teamEmit("alert", forceEndPlayer + " بازی را ترک کرد");
-            dataX = post_forceEndGame(e, forceEndPlayer , playerData);
-        }
-
+        e.teamEmit("gameEnd", {player: {name: forceEndPlayer}} , true);
 
     } else if (mode === 2) {
-        e.teamEmit("alert", "بازی به علت غیرفعال بودن بازیکنان، تمام شد.");
         e.teamEmit("gameEnd", true , true);
         dataX = post_gameIsClose(e , playerData);
     }
@@ -39,6 +33,9 @@ function run(e, mode, forceEndPlayer) {
     });
 
     clearFromDb(e);
+    e.players.toArray().map((p) => {
+        p.delete();
+    });
     removeGame(e.room_id);
 
 }

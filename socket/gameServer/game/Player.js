@@ -20,8 +20,6 @@ Player = function (scoket , location , Game ,name , tgID) {
     this.messQueue = [];
     this.isWaitingForCB = false;
     this.setGameEvents();
-
-
     this.setupNewSocket(scoket);
     this.sendConfig();
     this.sendToken();
@@ -100,17 +98,17 @@ Player.prototype.send = function (COM , res , withoutCallback , mess_ID) {
         let bar = 0;
         const sendInterval = setInterval(() => {
             bar++;
-            if (bar > 10){
-                return reject('client is offline')
-            }
+            if (bar > 10) return reject('client is offline');
             console.log('bad socket connection');
             send()
         } , 5000);
-        this.events.once(`messID_${mess_ID}` , () => {
+        const resolver = () => {
             clearInterval(sendInterval);
             this.isWaitingForCB = false;
-            resolve();
-        });
+            return resolve();
+        };
+        this.events.once(`messID_${mess_ID}` , resolver);
+        this.events.on('_resolveAllMess' , resolver);
   });
 };
 
@@ -136,6 +134,10 @@ Player.prototype.addQueue = function (COM , res) {
     });
     if (!this.isWaitingForCB) Player.checkQueue();
 
+};
+Player.prototype.delete = function(){
+    this.messQueue = [];
+    this.events.emit('_resolveAllMess');
 };
 Player.prototype.checkQueue = function () {
     if (this.messQueue.length > 0){

@@ -207,11 +207,11 @@ const teamScore = function (mess) {
     }
 
     function roundPrint(our, their) {
-        $("#score-rounds").html("حریف " + their + " | " + our + "ما ")
+        $("#score-rounds").html("حریف " + their + " | " + our + " ما ")
     }
 
     function gamePrint(our, their) {
-        $("#score-games").html("حریف " + their + " | " + our + "ما ")
+        $("#score-games").html("حریف " + their + " | " + our + " ما ")
 
     }
 
@@ -229,9 +229,10 @@ const teamScore = function (mess) {
 const gameEnd = function (mess) {
     gameEnd_frame.removeClass("hide").addClass("show");
     deskMove(true);
-    setTimeout(() => {
-        ui.hideMessage()
-    }, 2000);
+    if (mess.player.name) ui.showMessage( `${mess.player.name}از بازی خارج شد`);
+    // setTimeout(() => {
+    //     ui.hideMessage()
+    // }, 2000);
     window.socket.disconnect();
 };
 const game_newPlayer = function (mess) {
