@@ -15,10 +15,11 @@ newRound = async function (e) {
     e.cards = shuffleCards();
     await timeout(1500);
     heyHakemSetHokm(e);
-    e.status = 'waitForSetHokm';
+    e.isHokmSet = false;
 };
 
 onHokmSet = async function (e) {
+
     await e.teamEmit('newRound', {
         mode: 'allPlayers', cards: e.cards, hakem: e.hakem.toView()
     });

@@ -31,8 +31,8 @@ async function run(e) {
 
 }
 async function setNewHakem(e){
-    const hakemLoc = nextof(e.hakem.location,1);
-    e.hakem = e.players[hakemLoc];
+    const newHakemLoc = nextof(e.hakem.location,1);
+    e.hakem = e.players[newHakemLoc];
     await e.teamEmit('setHakem', {
         roundOne:false, hakem: e.hakem.toView(),
     });

@@ -7,8 +7,8 @@ async function run(e) {
     });
     await timeout(3000);
 
-    await e.teamEmit("setHokm",e.hakem.toView());
     e.hakem.events.once('setHokm' , (mess) => e._setHokmEvent(mess.hokm , true))
+    await e.teamEmit("setHokm",e.hakem.toView());
 
 }
 module.exports=run;

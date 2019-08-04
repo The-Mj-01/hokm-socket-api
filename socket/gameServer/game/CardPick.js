@@ -10,13 +10,14 @@ async function run(e, res, location) {
     console.log('P');
 
     async function add() {
-        e.preRoundGame[e.roundNum].card = res.card;
+        e.table.getTurnPlayer().card = res.card;
+        e.table.preRound++;
         await emit(e, res, location);
         onPlayerPick(e)
     }
 
-    if (e.suit === 'notSet') {
-        e.suit = res.card.suit;
+    if (e.table.suit === 'notSet') {
+        e.table.suit = res.card.suit;
         res.card.hasSuit = true;
         await add();
     } else {

@@ -4,34 +4,31 @@ const timeout = ms => new Promise(res => setTimeout(res, ms));
 const Round = require("./Round");
 
 async function nextPlayer(e){
-    const player = e.preRoundGame[e.roundNum];
+    const player = e.table.getTurnPlayer();
     player.events.once('pickCard' , ( card ) => {
+        player.isTurn = false;
         e._pickCard(card , player.location , player)
     });
     await e.teamEmit('setTurn',{
         player : player.toView(),
-        zamine : e.zamine,
-        suit   : e.suit
+        suit   : e.table.suit
     });
+    player.isTurn = true;
 
 
 }
 newPreRound = async function(e , _starter){
-    e.zamine = 'notSet';
-    e.suit = 'notSet';
-    e.roundNum = 0;
+    e.table.suit = 'notSet';
     const starter = _starter || e.preRoundStarter;
-    const players = e.players;
-    const first = starter.location;
-    const second = nextof(starter.location ,1);
-    const third = nextof(starter.location ,2);
-    const fourth = nextof(starter.location ,3);
-    e.preRoundGame = [
-        players[first],
-        players[second],
-        players[third],
-        players[fourth]
+
+    const { players } = e;
+    e.table.players = [
+        players[starter.location],
+        players[nextof(starter.location ,1)],
+        players[nextof(starter.location ,2)],
+        players[nextof(starter.location ,3)]
     ];
+    e.table.preRound = 0;
     await nextPlayer(e);
 };
 

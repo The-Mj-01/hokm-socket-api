@@ -1,15 +1,15 @@
 const chats = ['سلام!', '❤️😍', 'چه دستی!', 'دمت گرم!', 'خیلی کارت درسته!', 'چرا؟', 'از من یاد بگیر', 'عالیییییی!', '👌👌', 'اینم دسته؟']
-let suits = ['spade', 'heart', 'club', 'diamond'];
-let cardTrans = {
+const suits = ['spade', 'heart', 'club', 'diamond'];
+const cardTrans = {
     A: 1,
     2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7, 8: 8, 9: 9, 10: 10,
     J: 11, Q: 12, K: 13,
 };
 
 
-var frag;
+let frag;
 
-var CardDisplay = function (dom) {
+const CardDisplay = function (dom) {
     this.dom = $(dom);
     this.dom.on("click", function () {
         ///click every card
@@ -45,10 +45,11 @@ CardDisplay.prototype.adjustPos = function (pos) {
 };
 
 CardDisplay.prototype.setSelectable = function (yes) {
+    const self = this;
     if (yes) {
         this.dom.addClass("movable");
         this.dom.css({
-            zIndex: self.zIndex + 20
+            zIndex: self.zIndex + 50
         });
     } else {
         this.dom.removeClass("movable")
@@ -56,12 +57,7 @@ CardDisplay.prototype.setSelectable = function (yes) {
 };
 
 CardDisplay.prototype.grayScale = function (yes) {
-    const self = this;
-    if (yes) {
-        this.dom.addClass("grayScale");
-    } else {
-        this.dom.removeClass("grayScale");
-    }
+    (yes) ? this.dom.addClass("grayScale") : this.dom.removeClass("grayScale");
 };
 
 CardDisplay.prototype.isSelectable = function () {
@@ -69,7 +65,7 @@ CardDisplay.prototype.isSelectable = function () {
 };
 
 
-var PlayerDisplay = function (id, name, human) {
+const PlayerDisplay = function (id, name, human) {
 
     this.id = id;
     this.display = document.createElement('div');
@@ -170,7 +166,7 @@ const ChatDesk = function () {
     });
     this.display.appendChild(chatsSider);
     this.display.className = 'chatDesk';
-}
+};
 
 
 export default {

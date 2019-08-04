@@ -1,6 +1,5 @@
 let dba=require('./database');
 let startGame=require('./game/startPrim');
-let newPlayer=require('./game/newPlayer');let x;
 
 
 run = function (socket, r) {
