@@ -229,7 +229,7 @@ const teamScore = function (mess) {
 const gameEnd = function (mess) {
     gameEnd_frame.removeClass("hide").addClass("show");
     deskMove(true);
-    if (mess.player.name) ui.showMessage( `${mess.player.name}از بازی خارج شد`);
+    if (mess.player) ui.showMessage( `${mess.player.name}از بازی خارج شد`);
     // setTimeout(() => {
     //     ui.hideMessage()
     // }, 2000);

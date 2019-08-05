@@ -88,7 +88,7 @@ Player.prototype.sendToken = function () {
 };
 
 Player.prototype.send = function (COM , res , withoutCallback , mess_ID) {
-    if (!mess_ID) mess_ID = mess_ID_Gen();
+    if (!mess_ID && !withoutCallback) mess_ID = mess_ID_Gen();
     const mess = withoutCallback ? { COM , res } : { COM , res , mess_ID };
     const send = () => this.socket.emit('GAME' , mess);
     send();

@@ -99,7 +99,7 @@ Game.prototype.addplayer = function (scoket, location, playerData) {
    }
 };
 
-Game.prototype.teamEmit = function (COM, res, withoutCB) {
+Game.prototype.teamEmit = function (COM, res , withoutCB ) {
    console.log(`TEAM ${COM} | ${JSON.stringify(res)}`.white);
    const Players = this.players.toArray();
    Players.map(p => p.send(COM, res, withoutCB));
