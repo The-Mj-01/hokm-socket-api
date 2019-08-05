@@ -18,7 +18,7 @@ async function nextPlayer(e){
 
 }
 newPreRound = async function(e , _starter){
-    e.table.suit = 'notSet';
+    e.table.suit = undefined;
     const starter = _starter || e.preRoundStarter;
 
     const { players } = e;

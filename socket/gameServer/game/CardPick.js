@@ -16,12 +16,12 @@ async function run(e, res, location) {
         onPlayerPick(e)
     }
 
-    if (e.table.suit === 'notSet') {
+    if (!e.table.suit) {
         e.table.suit = res.card.suit;
         res.card.hasSuit = true;
         await add();
     } else {
-        if (res.card.suit === e.suit) await add();
+        if (res.card.suit === e.table.suit) await add();
         else if (res.card.hasSuit === false) await add();
         else {
             console.log("WTF 1".yellow);

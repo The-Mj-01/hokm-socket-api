@@ -11,7 +11,7 @@ async function run(e) {
         const c = p.card;
         e.table.cards.push(c);
         c.isHokm = p.card.suit*1 === hokmSwit * 1;
-        c.isSuit = p.card.suit*1 === e.suit*1;
+        c.isSuit = p.card.suit*1 === e.table.suit * 1;
         c.score=c.num;
         if (c.isSuit === true) c.score=  c.score + 100;
         if (c.isHokm === true) c.score=  c.score + 10000;

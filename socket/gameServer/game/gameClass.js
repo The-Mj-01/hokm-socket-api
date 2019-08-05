@@ -56,17 +56,12 @@ Game = function (room_id, rounds, roomData) {
       rightL: 0
    };
    this._isGameStarted = false;
-   this.hakem = 'notSet';
-   this.hokm = '';
    this.isHokmSet = false;
    this.cards = [];
    //this.roundNum = 0;
-   //this.suit='notSet';
    this.status = 'start';
    //this.preRound= 0;
-   this.preRoundStarter = 'notSet';
    this.preRoundPlayerNum = 0;
-   this.zamine = 'notSet';
    this.preRoundGame = [];
    this.numofPlayers = 0;
    this.setUpdate();
@@ -119,7 +114,7 @@ Game.prototype.setStatus = function (status) {
 
 Game.prototype.setHokm = async function (hokm) {
    this.hokm = hokm;
-   if (this.hokm && this.hokm !== 'notSet' && this.hakem) {
+   if (this.hokm && this.hakem) {
       await this.teamEmit("setHokm", this.hakem)
    }
 };
