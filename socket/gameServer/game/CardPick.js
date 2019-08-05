@@ -16,7 +16,7 @@ async function run(e, res, location) {
         onPlayerPick(e)
     }
 
-    if (!e.table.suit) {
+    if (typeof e.table.suit === 'undefined') { // don't use !e.table.suit
         e.table.suit = res.card.suit;
         res.card.hasSuit = true;
         await add();

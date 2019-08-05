@@ -147,14 +147,14 @@ const game_setTurn = function (mess) {
             let yourCard = game.run.getPlayers()[0].row.cards;
             let suit = mess.suit;
             config.setSuit(suit);
-            if (!suit) {
+            if (typeof suit === 'undefined') {  // don't use !suit
                 yourCard.forEach((card) => {
                     card.display.setSelectable(true)
                 });
             } else {
                 let i = 0;
                 yourCard.forEach((card) => {
-                    if (card.suit  === suit ) {
+                    if (card.suit  === suit) {
                         card.display.setSelectable(true);
                         i++
                     }
