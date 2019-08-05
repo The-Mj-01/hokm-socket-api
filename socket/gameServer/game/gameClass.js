@@ -89,8 +89,8 @@ Game.prototype.addplayer = function (scoket, location, playerData) {
       player.events.once('disconnect', () => {
          if (!this._isGameStarted) {
             this.numofPlayers--;
+            delete this.players[location];
             this.teamEmit('leftPlayer', {name, length: this.numofPlayers});
-            delete this.players[location]
          }
       });
       if (!this._isGameStarted && this.players.toArray().length >= 4) {
