@@ -15,6 +15,7 @@ let nameSpace;
 let socket = null;
 let socket_ID = null;
 //const serverPort = 443;
+let last_mess_id = 0;
 const setIntervalTime = 15000;
 let lastCOM;
 let evenDisconnected = false;
@@ -79,7 +80,16 @@ const connectTOS = function (CB) {
         console.log(mess);
         lastCOM = mess;
         game_core(mess);
-        if (mess.mess_ID) socket.emit('_CALLBACK', mess.mess_ID);
+        if (mess.mess_ID) {
+            const { mess_ID } = mess;
+            if ((mess_ID - last_mess_id) === 1) {
+                socket.emit('_CALLBACK', mess_ID);
+                last_mess_id = mess_ID;
+            } else {
+                socket.emit('_setMeMaster' , last_mess_id);
+                console.warn('bad mess ID' , { last_mess_id , mess_ID});
+            }
+        }
         Debug.log("GAME", mess)
 
     });
@@ -179,7 +189,7 @@ function socketConnect() {
         reconnectionDelayMax: 1000,
         transports: ['websocket']
     });
-    socket.heartbeatTimeout = 20000;
+    socket.heartbeatTimeout = 5000;
     return socket
 }
 

@@ -1,10 +1,7 @@
 const { toNum } = require('./Location');
 const EventEmitter = require('events');
 const auth = require('../auth');
-const Promise = require('bluebird');
-const crypto = require("crypto");
 const c = require('colors');
-const mess_ID_Gen = () => crypto.randomBytes(5).toString('hex');
 Player = function (scoket , location , Game ,name , tgID) {
     this.Game = Game;
     this.name = name;
@@ -16,6 +13,7 @@ Player = function (scoket , location , Game ,name , tgID) {
     this.isTurn = false;
     this.on = this.events.on;
     this.once = this.events.once;
+    this.numOfMess = 0;
     this.isOnline = true;
     this.messQueue = [];
     this.isWaitingForCB = false;
@@ -33,10 +31,10 @@ Player.prototype.setupNewSocket = function (socket) {
     if (!this.isOnline){
         this.Game.teamEmit('player_connect' , {
             location: self.location,
-        });
-
+        } , true);
         this.isOnline = true;
     }
+    this._sendToMaster().catch((e) => console.log('error while _sendToMaster'))
 };
 
 Player.prototype.sendConfig = function () {
@@ -44,6 +42,13 @@ Player.prototype.sendConfig = function () {
         room_id: this.Game.room_id,
         location: this.location
     })
+};
+Player.prototype._onDisconnect = function() {
+    this.isOnline = false;
+    const self = this;
+    if (this.Game) this.Game.teamEmit('player_disconnect' , {
+        location: self.location,
+    } , true)
 };
 
 Player.prototype.setGameEvents = function () {
@@ -54,20 +59,14 @@ Player.prototype.setGameEvents = function () {
     this.events.on('update' , () => {
         Game.setUpdate();
     });
-    this.events.on('disconnect' , () => {
-        this.isOnline = false;
-        const self = this;
-        if (this.Game) this.Game.teamEmit('player_disconnect' , {
-            location: self.location,
-        } , true)
-    });
+    this.events.on('disconnect' , () => this._onDisconnect());
     this.events.on('forceStop' , () => {
         Game._forceEndGame(this)
     });
     this.events.on('_CALLBACK' , (ID) => {
         this.events.emit(`messID_${ID}` , true);
-    })
-
+    });
+    this.events.on('_setMeMaster' , (last_messID) => this._setMeMaster(last_messID))
 
 };
 
@@ -78,7 +77,12 @@ Player.prototype.toView = function () {
         tg_id: this.tg_id ? this.tg_id : undefined
     }
 };
-
+Player.prototype._sendToMaster = function(){
+    console.log(this.messQueue);
+    const p = Promise.all(this.messQueue.map((mess) => this._send(mess.COM , mess.res , mess.mess_ID , false)));
+    this.messQueue = [];
+    return p
+};
 Player.prototype.sendToken = function () {
     const token = auth.sign({
         room_id: this.Game.room_id,
@@ -86,65 +90,44 @@ Player.prototype.sendToken = function () {
     });
     this.socket.emit('token' , token)
 };
+Player.prototype.send = function (COM , res , withoutCallback) {
+    if (!withoutCallback) this.numOfMess ++;
+    const mess_ID = this.numOfMess;
+    if (withoutCallback) return this._send(COM , res , mess_ID ,  withoutCallback);
+    this._send(COM , res , mess_ID, withoutCallback).catch((e) => {
+        console.log(`Promise TimeOut: ${mess_ID}`);
+        this._addQueue( COM , res , mess_ID );
+        if (this.isOnline) {
+            this.isOnline = false;
+            this._onDisconnect();
+        }
+    });
 
-Player.prototype.send = function (COM , res , withoutCallback , mess_ID) {
-    if (!mess_ID && !withoutCallback) mess_ID = mess_ID_Gen();
-    const mess = withoutCallback ? { COM , res } : { COM , res , mess_ID };
-    const send = () => this.socket.emit('GAME' , mess);
-    send();
+};
+Player.prototype._send = function (COM , res ,mess_ID , withoutCallback) {
+    const mess =  withoutCallback ? {COM , res } : { COM , res , mess_ID };
+    this.socket.emit('GAME' , mess);
     if (withoutCallback) return;
-    this.isWaitingForCB = true;
     return new Promise((resolve , reject) => {
-        let bar = 0;
-        const sendInterval = setInterval(() => {
-            bar++;
-            if (bar > 10) return reject('client is offline');
-            console.log('bad socket connection');
-            send()
-        } , 5000);
-        const resolver = () => {
-            clearInterval(sendInterval);
-            this.isWaitingForCB = false;
-            return resolve();
-        };
-        this.events.once(`messID_${mess_ID}` , resolver);
-        this.events.on('_resolveAllMess' , resolver);
-  });
+        this.events.once(`messID_${mess_ID}` , resolve);
+        setTimeout(() => reject('Promise TimeOut') , 2000);
+    });
 };
 
-Player.prototype.addQueue = function (COM , res) {
-    function deleteMess(mess_ID){
-        Player.messQueue =  Player.messQueue.filter((m) => m !== mess_ID )
-    }
-
-    const Player = this;
-    const mess_ID = mess_ID_Gen();
-    this.messQueue.push(mess_ID);
-    Player.events.once(`_exec${mess_ID}` , () => {
-        Player.send(COM , res , false , mess_ID)
-            .then(() => {
-                deleteMess(mess_ID);
-                Player.checkQueue();
-            })
-            .catch(e => {
-                console.log("err while sending ");
-                deleteMess(mess_ID);
-                Player.checkQueue();
-            })
-    });
-    if (!this.isWaitingForCB) Player.checkQueue();
-
+Player.prototype._addQueue = function ( COM , res , mess_ID) {
+    if (this.messQueue.length > 100) this.messQueue.shift();
+    this.messQueue.push({COM , res , mess_ID});
 };
 Player.prototype.delete = function(){
     this.messQueue = [];
-    this.events.emit('_resolveAllMess');
+    //this.events.emit('_resolveAllMess');
 };
-Player.prototype.checkQueue = function () {
-    if (this.messQueue.length > 0){
-        const mess_ID = this.messQueue[0];
-        this.events.emit(`_exec${mess_ID}`)
-    }
+Player.prototype._setMeMaster = function(last_mess_id){
+    console.log(`_setMeMaster ${last_mess_id}`);
+    this.messQueue = this.messQueue.filter((mess) => mess.mess_ID > last_mess_id);
+    this._sendToMaster();
 };
+
 
 const setEvents = (socket , events , game) => {
     socket.on('GAME' , (mess) => {
@@ -156,14 +139,11 @@ const setEvents = (socket , events , game) => {
     socket.on('disconnect' , (r) => {
         events.emit('disconnect' , r);
         this.isOnline = false;
-
     });
-    socket.on('error' , (r) => {
-        events.emit('error' , r);
-    });
-    socket.on('_CALLBACK' , (r) => {
-        events.emit('_CALLBACK' , r);
-    });
+    socket.on('error' , (r) => events.emit('error' , r));
+    socket.on('_CALLBACK' , (r) => events.emit('_CALLBACK' , r)
+    );
+    socket.on('_setMeMaster' , (last_messID) => events.emit('_setMeMaster' , last_messID))
 
 };
 

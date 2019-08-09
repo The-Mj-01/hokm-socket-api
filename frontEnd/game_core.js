@@ -7,26 +7,18 @@ import game from './game'
 
 const cardDelay = 170;
 
-
 let setHokmDOM = $('#setHokm');
 let hokm_icon = $("#hokm_icon");
 let room_id = config.getRoom_id();
 let gameEnd_frame = $('#gameEnd');
 let desk = $("#team-score");
-
-$('#hokm_gish').click(() => {
-    send_hokm('gish')
-});
-$('#hokm_del').click(() => {
-    send_hokm('del')
-});
-$('#hokm_pik').click(() => {
-    send_hokm('pik')
-});
-$('#hokm_khesht').click(() => {
-    send_hokm('khesht')
-});
-let testBut = $("#testBut");
+let nextCOM = {};
+let isRaadyForTurn = true;
+$('#hokm_gish').click(() => send_hokm('gish'));
+$('#hokm_del').click(() => send_hokm('del'));
+$('#hokm_pik').click(() => send_hokm('pik'));
+$('#hokm_khesht').click(() => send_hokm('khesht'));
+const testBut = $("#testBut");
 testBut.click(() => {
     window.socket.emit("getMyID", true);
 });
@@ -37,6 +29,11 @@ function send_hokm(hokm) {
         setHokmDOM.removeClass('show').addClass('hide');
     }
 }
+
+// const resolveNextCOM = function () {
+//   if (nextCOM && nextCOM.func) nextCOM.func(nextCOM.mess);
+//   nextCOM = {};
+// };
 
 const game_start = function (mess) {
     let location = {};
@@ -74,14 +71,8 @@ const game_newRound = function (mess) {
         let hakem = mess.hakem;
         game.run.setStatus('clearTable', true);
         let hakem_location = config.getLocOfPlayers(hakem);
-        if (cards) {
-            let i = 0;
-            cards.forEach(() => {
-                game.run.moveCard.toPlayer(hakem_location, cards[i]);
-                i++
-            })
+        if (cards) cards.map((card) => game.run.moveCard.toPlayer(hakem_location, card))
 
-        }
     } else if (mess.mode === 'allPlayers') {
         let cards = mess.cards;
         let hakem = mess.hakem;
@@ -91,7 +82,7 @@ const game_newRound = function (mess) {
             let five = 0;
             let r = 0, newfive = 0;
             let i = 0;
-
+            isRaadyForTurn = false;
             const moveA = () => {
                 if (r === 3) newfive = 1;
                 if (five === 5) {
@@ -108,6 +99,10 @@ const game_newRound = function (mess) {
             const moveB = () => {
                 setTimeout(() => {
                     if (i < cards.length) moveA();
+                    else {
+                       // isRaadyForTurn = true;
+                        //resolveNextCOM();
+                    }
                 }, cardDelay)
             };
 
@@ -135,6 +130,8 @@ const game_hokmSeted = function (mess) {
     ui.showMoveMess(x[mess])
 };
 const game_setTurn = function (mess) {
+    //if (!isRaadyForTurn) return nextCOM = {func:game_setTurn , mess};
+   // isRaadyForTurn = true;
     ui.hideMessage();
     let players = game.run.getPlayers();
     players.forEach((player) => {
