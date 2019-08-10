@@ -14,7 +14,7 @@ Player = function (scoket , location , Game ,name , tgID) {
     this.on = this.events.on;
     this.once = this.events.once;
     this.numOfMess = 0;
-    this.isOnline = true;
+    this._isOnline = true;
     this.messQueue = [];
     this.isWaitingForCB = false;
     this.setGameEvents();
@@ -27,13 +27,7 @@ Player.prototype.setupNewSocket = function (socket) {
     this.socket = socket;
     socket.join(this.Game.room_id);
     setEvents(this.socket , this.events , this);
-    const self = this;
-    if (!this.isOnline){
-        this.Game.teamEmit('player_connect' , {
-            location: self.location,
-        } , true);
-        this.isOnline = true;
-    }
+    this.setOnlineState(true);
     this._sendToMaster().catch((e) => console.log('error while _sendToMaster'))
 };
 
@@ -43,13 +37,14 @@ Player.prototype.sendConfig = function () {
         location: this.location
     })
 };
-Player.prototype._onDisconnect = function() {
-    this.isOnline = false;
-    const self = this;
-    if (this.Game) this.Game.teamEmit('player_disconnect' , {
-        location: self.location,
-    } , true)
+Player.prototype.setOnlineState = function (state) {
+    const location = this.location;
+    if (state && !this._isOnline)this.Game.teamEmit('player_connect' , {location} , true);
+    else if (!state && this._isOnline) this.Game.teamEmit('player_disconnect' , {location} , true)
+    this._isOnline = state;
+
 };
+
 
 Player.prototype.setGameEvents = function () {
     const Game = this.Game;
@@ -59,11 +54,12 @@ Player.prototype.setGameEvents = function () {
     this.events.on('update' , () => {
         Game.setUpdate();
     });
-    this.events.on('disconnect' , () => this._onDisconnect());
+    this.events.on('disconnect' , () => this.setOnlineState(false));
     this.events.on('forceStop' , () => {
         Game._forceEndGame(this)
     });
     this.events.on('_CALLBACK' , (ID) => {
+        this.setOnlineState(true);
         this.events.emit(`messID_${ID}` , true);
     });
     this.events.on('_setMeMaster' , (last_messID) => this._setMeMaster(last_messID))
@@ -97,10 +93,7 @@ Player.prototype.send = function (COM , res , withoutCallback) {
     this._send(COM , res , mess_ID, withoutCallback).catch((e) => {
         console.log(`Promise TimeOut: ${mess_ID}`);
         this._addQueue( COM , res , mess_ID );
-        if (this.isOnline) {
-            this.isOnline = false;
-            this._onDisconnect();
-        }
+        this.setOnlineState(false);
     });
 
 };
@@ -110,7 +103,7 @@ Player.prototype._send = function (COM , res ,mess_ID , withoutCallback) {
     if (withoutCallback) return;
     return new Promise((resolve , reject) => {
         this.events.once(`messID_${mess_ID}` , resolve);
-        setTimeout(() => reject('Promise TimeOut') , 2000);
+        setTimeout(() => reject('Promise TimeOut') , 5000);
     });
 };
 
@@ -138,7 +131,6 @@ const setEvents = (socket , events , game) => {
     });
     socket.on('disconnect' , (r) => {
         events.emit('disconnect' , r);
-        this.isOnline = false;
     });
     socket.on('error' , (r) => events.emit('error' , r));
     socket.on('_CALLBACK' , (r) => events.emit('_CALLBACK' , r)
