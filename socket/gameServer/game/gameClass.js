@@ -15,13 +15,8 @@ const routes = {
    onHokmSeted: require('./Round').onHokmSet,
 };
 
-Game = function (room_id, rounds, roomData) {
-   this.newTime = 0;
-   this.oldTime = new Date().getTime();
+Game = function (room_id,roomData) {
    this.room_id = room_id;
-
-
-   this.commits = [];
    this.timer = null;
    this.players = {
       0: null,
@@ -44,9 +39,9 @@ Game = function (room_id, rounds, roomData) {
 
 
 
-   this.rounds = rounds;
+   this.rounds = roomData.rounds;
    this.gameType = roomData.type;
-   this.namespace = roomData.namespace;
+   this.namespace = 'Hokm';
    this.preRoundteamScore = {
       topB: 0,
       rightL: 0
@@ -58,31 +53,29 @@ Game = function (room_id, rounds, roomData) {
    this._isGameStarted = false;
    this.isHokmSet = false;
    this.cards = [];
-   //this.roundNum = 0;
    this.status = 'start';
-   //this.preRound= 0;
    this.preRoundPlayerNum = 0;
    this.preRoundGame = [];
    this.numofPlayers = 0;
-   this.setUpdate();
-
-
 };
 
 Game.prototype.emit = function (x, y) { // todo: remove
    io.of('/globalHokm').in(this.room_id).emit(x, y)
 };
 
-Game.prototype.addplayer = function (scoket, location, playerData) {
+Game.prototype.addplayer = function (socket, location, playerData) {
    const {name, tgID} = playerData;
    if (location) location = toNum(location);
    else location = this.getEmptyLocations()[0];
 
-   if (this.players[location]) this.players[location].setupNewSocket(scoket);
-
+   if (this.players[location]) this.players[location].setupNewSocket(socket);
    else {
+      if (this.players.toArray().length === 4) {
+         socket.emit('S_ERR' , 'GAME IS FULL');
+         socket.disconnect()
+      }
       this.numofPlayers++;
-      const player = new Player(scoket, location, this, name, tgID);
+      const player = new Player(socket, location, this, name, tgID);
       this.players[location] = player;
       const onlines = this.numofPlayers;
       if (onlines < 4) this.teamEmit('newPlayer', {name, length: onlines});
@@ -148,7 +141,6 @@ Game.prototype._pickCard = function (card, location) {
    cardPick(this, card, location)
 };
 Game.prototype.hook = function (id, mess) {
-   this.setUpdate();
    const {COM} = mess;
    if (COM === 'JOIN_ME') this._joinOfflinePlayer(mess.res);
 };
@@ -158,19 +150,7 @@ Game.prototype.getRoundPlayed = function () {
 };
 
 
-Game.prototype.setUpdate = function () {
-   self = this;
-   this.stopUpdateTime();
-   this.newTime = new Date().getTime();
-   this.oldTime = this.newTime;
 
-   this.timer = setTimeout(() => {
-      checkUpdateTime(this)
-   }, (5 * 60 * 1000) + 100)
-};
-Game.prototype.stopUpdateTime = function () {
-   if (this.timer) clearTimeout(this.timer);
-};
 Game.prototype.renewPreRoundScore = function () {
    this.preRoundteamScore.rightL = 0;
    this.preRoundteamScore.topB = 0;
@@ -187,14 +167,6 @@ Game.prototype.getEmptyLocations = function () {
 };
 
 
-
-function checkUpdateTime(self) {
-   self.newTime = new Date().getTime();
-   let delta = self.newTime - self.oldTime;
-   if (delta > (5 * 60 * 1000) && this._isGameStarted) {
-      endGame(self, 2)
-   }
-}
 
 
 module.exports = Game;

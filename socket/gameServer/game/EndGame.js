@@ -1,18 +1,9 @@
 ﻿const apiReq = require('../../server&routers/apiGetReq');
 const url = require('../../../glob_var').app.hook_url;
 const removeGame = require('../gamesManager').removeGame;
-const dba = require('../database');
 
 function run(e, mode, forceEndPlayer) {
     let dataX = null;
-
-    try {
-        e.stopUpdateTime();
-    } catch (error) {
-        mode = 2;
-        console.log(e);
-        console.log(error)
-    }
     const playerData = daleteBadPlayersData(e);
 
 
@@ -32,7 +23,6 @@ function run(e, mode, forceEndPlayer) {
         //console.log(data);
     });
 
-    clearFromDb(e);
     e.players.toArray().map((p) => {
         p.delete();
     });
@@ -79,21 +69,7 @@ function post_gameIsClose(e , PD) {
 
 }
 
-function clearFromDb(e) {
-    const room = dba.getRoomsUpdate();
-    try {
-        room.chain().find({'id': e.room_id}).update((x) => {
-            x.id = null;
-            x.players = [];
-            x.rounds = null;
-        })
-    }
-    catch (e) {
-        console.log('no game fined in loki to remove')
-    }
 
-
-}
 daleteBadPlayersData=function(e){
     let p = [];
     e.players.toArray().forEach(player=>{

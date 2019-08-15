@@ -51,9 +51,6 @@ Player.prototype.setGameEvents = function () {
     this.events.on('chat' , (mess) => {
         Game.sendChat(mess , this.location);
     });
-    this.events.on('update' , () => {
-        Game.setUpdate();
-    });
     this.events.on('disconnect' , () => this.setOnlineState(false));
     this.events.on('forceStop' , () => {
         Game._forceEndGame(this)
@@ -90,7 +87,7 @@ Player.prototype.send = function (COM , res , withoutCallback) {
     if (!withoutCallback) this.numOfMess ++;
     const mess_ID = this.numOfMess;
     if (withoutCallback) return this._send(COM , res , mess_ID ,  withoutCallback);
-    this._send(COM , res , mess_ID, withoutCallback).catch((e) => {
+    this._send(COM , res , mess_ID, false).catch((e) => {
         console.log(`Promise TimeOut: ${mess_ID}`);
         this._addQueue( COM , res , mess_ID );
         this.setOnlineState(false);
@@ -99,7 +96,7 @@ Player.prototype.send = function (COM , res , withoutCallback) {
 };
 Player.prototype._send = function (COM , res ,mess_ID , withoutCallback) {
     const mess =  withoutCallback ? {COM , res } : { COM , res , mess_ID };
-    this.socket.emit('GAME' , mess);
+    withoutCallback ? this.socket.emit('GAME' , mess) : this.socket.emit('GAME' , mess);
     if (withoutCallback) return;
     return new Promise((resolve , reject) => {
         this.events.once(`messID_${mess_ID}` , resolve);
@@ -117,7 +114,7 @@ Player.prototype.delete = function(){
 };
 Player.prototype._setMeMaster = function(last_mess_id){
     console.log(`_setMeMaster ${last_mess_id}`);
-    this.messQueue = this.messQueue.filter((mess) => mess.mess_ID > last_mess_id);
+    this.messQueue = this.messQueue.filter((mess) => mess.mess_ID >= last_mess_id);
     this._sendToMaster();
 };
 
@@ -127,14 +124,10 @@ const setEvents = (socket , events , game) => {
         const { COM , res } = mess;
         console.log(`PLAYER: ${game.name} | ${game.location} | ${COM} | ${JSON.stringify(res)}`.green);
         events.emit(COM , res);
-        events.emit('update');
     });
-    socket.on('disconnect' , (r) => {
-        events.emit('disconnect' , r);
-    });
+    socket.on('disconnect' , (r) => events.emit('disconnect' , r));
     socket.on('error' , (r) => events.emit('error' , r));
-    socket.on('_CALLBACK' , (r) => events.emit('_CALLBACK' , r)
-    );
+    socket.on('_CALLBACK' , (r) => events.emit('_CALLBACK' , r));
     socket.on('_setMeMaster' , (last_messID) => events.emit('_setMeMaster' , last_messID))
 
 };

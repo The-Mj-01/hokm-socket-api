@@ -1,7 +1,7 @@
-const    nameSpaces = ['hokm' , 'globalHokm' ,  'pingTest'];
-const    M_globalRoom = require('./gameServer/globalRoom');
-const    M_loginRoomStart = require('./gameServer/loginRoomStart');
-const    M_loginRoom = require('./gameServer/loginRoom');
+const    nameSpaces = ['Hokm' ,'pingTest'];
+const    GameFactory = require('./gameServer/GameFactory');
+// const    M_loginRoomStart = require('./gameServer/loginRoomStart');
+// const    M_loginRoom = require('./gameServer/loginRoom');
 const    GameHookRouter = require('./gameServer/gamesManager').route;
 const    myDebug = require('./myDebug');
 const auth = require('./gameServer/auth');
@@ -20,53 +20,19 @@ getNameSpaces = function(NSs){
 
 addNS=function(_io) {
     io = _io;
-    const {hokm , globalHokm , pingTest} = getNameSpaces(nameSpaces);
+    const {Hokm , pingTest} = getNameSpaces(nameSpaces);
 
     pingTest.on('connection', client => {
-        client.on('pingT',()=>{
-            client.emit('pongT');
-        });
+        client.on('pingT',() => client.emit('pongT'));
     });
-    hokm.on('connection', client => {
-
-        const socket= {io: hokm,client: client};
-        everyNS(client,socket);
-        client.on('loginRoom',(room)=>{
-            const socketID="stb_"+client.id;
-            client.emit('setSocketID',socketID);
-            client.socketID=socketID;
-            M_loginRoom(socket,room)
-        });
-
-        client.on('loginRoomStart',(room) => {
-            M_loginRoomStart(socket,room)
-        });
-
+    Hokm.on('connection', (client) => {
+        everyNS(client);
+        client.once('JOIN_ME', (data) => GameFactory.newPlayer(client, data));
     });
-    globalHokm.on('connection', (client) => {
-
-        const  socket = {io: globalHokm, client: client};
-
-        everyNS(client, socket);
-        client.on('singUpGlobalRoom', (data) => {
-            //myDebug('singUpGlobalRoom',client,data);
-            //console.log(client.handshake.headers);
-
-
-            (M_globalRoom.newPlayer)(client, data, client.id, globalHokm)
-        });
-
-
-    });
-
-
-
 
 };
 function everyNS(client) {
-    client.on('pingT', (x) => {
-        client.emit('pongT', true);
-    });
+    client.on('pingT',()=> client.emit('pongT'));
 
     client.on('token', (token) => {
         const userData = auth.verify(token);
@@ -78,6 +44,7 @@ function everyNS(client) {
     });
 
     client.on('error', function (err) {
+        console.log('ERROR' , err);
         myDebug('error',client,err);
     });
 

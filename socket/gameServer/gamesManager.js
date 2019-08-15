@@ -2,14 +2,13 @@
 const allGames = {};
 
 createPrivate = function (room_id , roomData) {
-    roomData.type="private";
-    roomData.namespace="hokm";
+    if (allGames[room_id]) return allGames[room_id];
+    roomData.type='private';
     return create(room_id , roomData)
 };
 
 createGlobal = function (room_id , roomData ) {
-    roomData.type="global";
-    roomData.namespace="globalHokm";
+    roomData.type='global';
     return create(room_id , roomData)
 };
 
@@ -36,10 +35,12 @@ exports.removeGame = removeGame;
 exports.route = route;
 
 
+
 const Game = require('./game/gameClass');
 function create(room_id , roomData) {
-    const game = new Game(room_id,null,roomData);
+    const game = new Game(room_id,roomData);
     allGames[room_id] = game;
+    setTimeout(() => removeGame(room_id) , 120 * 60 * 1000);
     return game
 }
 

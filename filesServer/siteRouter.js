@@ -1,10 +1,7 @@
 const  siteRoutes = {};
 const P404 = require('./website/pages/404/404');
-siteRoutes['/hokm'] = require("./website/pages/hokm/hokm").ind;
+siteRoutes['/'] = require("./website/pages/hokm/hokm").ind;
 siteRoutes['/pingTest'] = require("./website/pages/pingTest/pingTest").ind;
-siteRoutes['/IGHokm'] = require("./website/pages/iframe/iframe").ind;
-
-
 
 index = function (app) {
     for(let route in siteRoutes) {
