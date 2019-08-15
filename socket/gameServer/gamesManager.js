@@ -1,15 +1,19 @@
 
 const allGames = {};
-
-createPrivate = function (room_id , roomData) {
+let globalGameNum = 0;
+getGlobalName = () => `G_${globalGameNum}`;
+exports.getPrivate = function (room_id , roomData) {
     if (allGames[room_id]) return allGames[room_id];
     roomData.type='private';
     return create(room_id , roomData)
 };
 
-createGlobal = function (room_id , roomData ) {
+exports.getGlobal = function (roomData = {}) {
     roomData.type='global';
-    return create(room_id , roomData)
+    console.log(getGlobalName());
+    if (allGames[getGlobalName()] && !allGames[getGlobalName()]._isGameStarted) return allGames[getGlobalName()];
+    globalGameNum++;
+    return create(getGlobalName() , roomData)
 };
 
 function route( client , mess) {
@@ -27,10 +31,11 @@ function route( client , mess) {
 }
 
 removeGame = function (room_id) {
-    if(allGames[room_id]) delete allGames[room_id];
+    if(allGames[room_id]) {
+        delete allGames[room_id];
+        console.log(`room_id removed`)
+    }
 };
-exports.createPrivate = createPrivate;
-exports.createGlobal = createGlobal;
 exports.removeGame = removeGame;
 exports.route = route;
 
@@ -38,10 +43,8 @@ exports.route = route;
 
 const Game = require('./game/gameClass');
 function create(room_id , roomData) {
-    const game = new Game(room_id,roomData);
-    allGames[room_id] = game;
-    setTimeout(() => removeGame(room_id) , 120 * 60 * 1000);
-    return game
+    allGames[room_id] = new Game(room_id,roomData);
+    return allGames[room_id]
 }
 
 

@@ -87,6 +87,7 @@ Game.prototype.addplayer = function (socket, location, playerData) {
          }
       });
       if (!this._isGameStarted && this.players.toArray().length >= 4) {
+         this._isGameStarted = true;
          this.run('start');
       }
    }
