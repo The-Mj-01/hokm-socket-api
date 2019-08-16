@@ -41,9 +41,12 @@ game.load = function () {
 
     nextTimer = 0;
     domBinding.createChatDesk();
+    domBinding.createExitBut();
+
+
 
     waitDefer = function (time) {
-        var d = $.Deferred();
+        const d = $.Deferred();
         setTimeout(function () {
             d.resolve();
         }, time);

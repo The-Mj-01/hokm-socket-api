@@ -226,20 +226,20 @@ const teamScore = function (mess) {
 const gameEnd = function (mess) {
     gameEnd_frame.removeClass("hide").addClass("show");
     deskMove(true);
-    if (mess.player) ui.showMessage( `${mess.player.name}از بازی خارج شد`);
+    if (mess.player) ui.showMessage( ` ${mess.player.name}از بازی خارج شد `);
     // setTimeout(() => {
     //     ui.hideMessage()
     // }, 2000);
     window.socket.disconnect();
 };
 const game_newPlayer = function (mess) {
-    ui.showMoveMess(`${mess.name} وارد بازی شد `);
+    ui.showMoveMess(` ${mess.name} وارد بازی شد `);
     setTimeout(() => {
         ui.showMessage(`آنلاین ها: ${mess.length}`)
     }, 2000)
 };
 const game_leftPlayer = function (mess) {
-    ui.showMoveMess(`${mess.name} از بازی خارج شد `);
+    ui.showMoveMess(` ${mess.name} از بازی خارج شد `);
     setTimeout(() => {
         ui.showMessage(`آنلاین ها: ${mess.length}`)
     }, 2000)

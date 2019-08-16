@@ -16,11 +16,7 @@ function gameForceStop() {
 
     });
 
-    $("#forceStopCancel").click(() => {
-        $(".stopFrame").removeClass('show').addClass('hide');
-        $("#game-region").removeClass('blur');
 
-    })
 }
 
 function forceStop() {

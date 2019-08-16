@@ -1,4 +1,4 @@
-const chats = ['سلام!', '❤️😍', 'چه دستی!', 'دمت گرم!','زود باش' ,'خیلی کارت درسته!', 'چرا؟', 'از من یاد بگیر', 'عالیییییی!', '👌👌', 'اینم دسته؟']
+const chats = ['❤️😍', 'چه دستی!', 'دمت گرم!','زود باش' ,'خیلی کارت درسته!', 'چرا؟', 'از من یاد بگیر', 'عالیییییی!', '👌👌', 'سلام!', 'اینم دسته؟'];
 const suits = ['spade', 'heart', 'club', 'diamond'];
 const cardTrans = {
     A: 1,
@@ -154,20 +154,36 @@ PlayerDisplay.prototype.highlight = function () {
 const ChatDesk = function () {
     this.display = document.createElement('div');
     const chatsSider = document.createElement('div');
-    chatsSider.classList = "chatsSider";
+    chatsSider.classList = 'chatsSider';
     chats.forEach(chatMess => {
         const chat = document.createElement('div');
         chat.innerHTML = chatMess;
-        chat.className = "chatBox"
-        chat.onclick = function () {
-            window.gameEmitor("chat", chatMess);
-        };
+        chat.className = "chatBox";
+        chat.onclick = () => window.gameEmitor("chat", chatMess);
         chatsSider.appendChild(chat);
     });
     this.display.appendChild(chatsSider);
     this.display.className = 'chatDesk';
 };
+const ExitGame = function () {
 
+    this.display = document.createElement('div');
+    const button = document.createElement('div');
+    const frame = $(".stopFrame");
+
+    const frameState = (show) => show ? frame.removeClass('hide').addClass('show') : frame.addClass('hide').removeClass('show');
+    button.className = "forceStopIcon";
+    button.onclick = () => frameState(true);
+    $('#forceStop').click(() => {
+        window.gameEmitor('EXIT_GAME');
+        frameState(false)
+    });
+    $('#forceStopCancel').click(() => frameState(false));
+
+
+    this.display.appendChild(button);
+    this.display.className = 'cornerButton topLeft';
+};
 
 export default {
     fragmentToDom: function (dom) {
@@ -179,6 +195,10 @@ export default {
     createChatDesk: function () {
         const cd = new ChatDesk();
         frag.appendChild(cd.display);
+    },
+    createExitBut: function() {
+        const e = new ExitGame();
+        frag.appendChild(e.display);
     },
     createPlayerDisplay: function (id, name) {
         return new PlayerDisplay(id, name);

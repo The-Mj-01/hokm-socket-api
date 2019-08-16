@@ -52,7 +52,7 @@ Player.prototype.setGameEvents = function () {
         Game.sendChat(mess , this.location);
     });
     this.events.on('disconnect' , () => this.setOnlineState(false));
-    this.events.on('forceStop' , () => {
+    this.events.on('EXIT_GAME' , () => {
         Game._forceEndGame(this)
     });
     this.events.on('_CALLBACK' , (ID) => {

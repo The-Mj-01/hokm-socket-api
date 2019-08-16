@@ -11,6 +11,11 @@ export default function () {
     game.load();
     $(".cornerButton").removeClass("hide").addClass("show");
 
+    // $('.forceStopIcon').click(() => {
+    //     $(".stopFrame").removeClass('hide').addClass('show');
+    //     $("#game-region").addClass('blur');
+    // });
+
     layout.region = $('#game-region')[0];
     layout.adjust();
 
