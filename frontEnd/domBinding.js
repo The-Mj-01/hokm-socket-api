@@ -29,16 +29,13 @@ let getCardIconPos = function (numtext) {
 };
 
 CardDisplay.prototype.adjustPos = function (pos) {
-    if (!pos.rotation) {
-        pos.rotation = 0;
-    }
-    if (!pos.rotateY) {
-        pos.rotateY = 0;
-    }
+    if (!pos.rotation) pos.rotation = 0;
+    if (!pos.rotateY)  pos.rotateY = 0;
     const zIndex = 10 + pos.z;
+
     this.dom.css({
         zIndex,
-        transform: 'rotate(' + pos.rotation + 'deg) translate3d(' + pos.x + 'px, ' + pos.y + 'px, ' + pos.z + 'px) rotateY(' + pos.rotateY + 'deg)'
+        transform: `rotate(${pos.rotation}deg) translate3d(${pos.x}px, ${pos.y}px, ${pos.z}px) rotateY(${pos.rotateY}deg) perspective(20px)`
     });
     this.zIndex = zIndex;
 
@@ -48,12 +45,15 @@ CardDisplay.prototype.setSelectable = function (yes) {
     const self = this;
     if (yes) {
         this.dom.addClass("movable");
+        this.scale = 1.1;
         this.dom.css({
             zIndex: self.zIndex + 50
         });
     } else {
+        this.scale = 1;
         this.dom.removeClass("movable")
     }
+    
 };
 
 CardDisplay.prototype.grayScale = function (yes) {
@@ -75,7 +75,6 @@ const PlayerDisplay = function (id, name, human) {
     this.nametext.className = 'player-name';
     this.nametext.innerHTML = name;
 
-
     this.hakemTag = document.createElement('div');
     this.hakemTag.className = 'hakemTag';
 
@@ -85,7 +84,6 @@ const PlayerDisplay = function (id, name, human) {
     this.display.appendChild(this.nametext);
     this.display.appendChild(this.hakemTag);
     this.display.appendChild(this.chatbar);
-
 
     frag.appendChild(this.display);
 
@@ -226,7 +224,6 @@ export default {
         let pic = document.createElement('div');
         $(pic).css({
             background: `url(../files/img/card/${suit}.png) ${cardPicPos.x}px ${cardPicPos.y}px`,
-            scale: "1.2"
         });
         pic.className = 'card_pic';
 

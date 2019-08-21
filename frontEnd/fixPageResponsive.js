@@ -46,7 +46,12 @@ const responsive = () => {
             width = maxWidth;
             height = maxHeight;
         }
-        page.attr('style', `-webkit-transform:scale(${basePage.scale}); width:${width}px; height:${height}px;`);
+        //page.attr('style', `-webkit-transform:scale(${basePage.scale}); width:${width}px; height:${height}px;`);
+        page.css({
+            width: `${width}px`,
+            height: `${height}px`,
+            transform: `scale(${basePage.scale}) perspective(20px)`
+        })
     }
 };
 

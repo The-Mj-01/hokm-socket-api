@@ -7,19 +7,6 @@ var room_id;
 var suit;
 var wasteCards = [];
 
-const STN = {
-    buttom: 0,
-    left: 1,
-    top: 2,
-    right: 3,
-};
-const NTS = {
-    0: "bottom",
-    1: "left",
-    2: "top",
-    3: "right",
-};
-
 export default {
     setMyName: function (name) {
         myName = name

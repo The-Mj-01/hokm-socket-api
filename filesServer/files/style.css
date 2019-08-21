@@ -844,7 +844,7 @@ border: rgb(204, 255, 0) 2px solid
      transform: scale(1.1);
 }
 
-.card.grayScale .front {
+.card.grayScale {
     filter: grayscale(100%);
     opacity: 0.6;
     transform: scale(0.8);

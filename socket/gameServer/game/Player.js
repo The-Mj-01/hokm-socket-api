@@ -28,7 +28,6 @@ Player.prototype.setupNewSocket = function (socket) {
     socket.join(this.Game.room_id);
     setEvents(this.socket , this.events , this);
     this.setOnlineState(true);
-    this._sendToMaster().catch((e) => console.log('error while _sendToMaster'))
 };
 
 Player.prototype.sendConfig = function () {
@@ -39,7 +38,10 @@ Player.prototype.sendConfig = function () {
 };
 Player.prototype.setOnlineState = function (state) {
     const location = this.location;
-    if (state && !this._isOnline)this.Game.teamEmit('player_connect' , {location} , true);
+    if (state && !this._isOnline) {
+        this._sendToMaster();
+        this.Game.teamEmit('player_connect' , {location} , true)
+    }
     else if (!state && this._isOnline) this.Game.teamEmit('player_disconnect' , {location} , true)
     this._isOnline = state;
 
@@ -59,6 +61,7 @@ Player.prototype.setGameEvents = function () {
         this.setOnlineState(true);
         this.events.emit(`messID_${ID}` , true);
     });
+    this.events.on('pingT' , () => this.setOnlineState(true));
     this.events.on('_setMeMaster' , (last_messID) => this._setMeMaster(last_messID))
 
 };
@@ -126,6 +129,7 @@ const setEvents = (socket , events , game) => {
         events.emit(COM , res);
     });
     socket.on('disconnect' , (r) => events.emit('disconnect' , r));
+    socket.on('pingT' , () => events.emit('pingT'));
     socket.on('error' , (r) => events.emit('error' , r));
     socket.on('_CALLBACK' , (r) => events.emit('_CALLBACK' , r));
     socket.on('_setMeMaster' , (last_messID) => events.emit('_setMeMaster' , last_messID))
