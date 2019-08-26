@@ -2,7 +2,6 @@ const Player = require('./Player');
 const cardPick = require('./CardPick');
 const endGame = require('./EndGame');
 const io = require('../../io');
-const myDebuger = require('../../myDebug');
 const chat = require('./chat');
 const {toNum} = require('./Location');
 
@@ -94,7 +93,7 @@ Game.prototype.addplayer = function (socket, location, playerData) {
 };
 
 Game.prototype.teamEmit = function (COM, res , withoutCB ) {
-   console.log(`TEAM ${COM} | ${JSON.stringify(res)}`.white);
+   console.log(`TEAM ${COM} | ${JSON.stringify(res)} | ${withoutCB}`.white);
    this.players.toArray().map(p => p.send(COM, res, withoutCB));
 };
 Game.prototype.run = function (status) {
@@ -165,6 +164,11 @@ Game.prototype.getEmptyLocations = function () {
       const location = usedLocations.filter((l) => loc === l);
       return (location.length === 0);
    });
+};
+
+Game.prototype.removeListeners = function () {
+   console.log('____removeListeners');
+   this.players.toArray().forEach((p) => p._removeListeners());
 };
 
 

@@ -6,11 +6,11 @@ Player = function (scoket , location , Game ,name , tgID) {
     this.Game = Game;
     this.name = name;
     this.tgID = tgID;
-    this.gameType = 'Global';
     this.location = toNum(location);
     this.events = new EventEmitter();
     this.cards = [];
     this.isTurn = false;
+    this.playerLeft = false;
     this.on = this.events.on;
     this.once = this.events.once;
     this.numOfMess = 0;
@@ -91,6 +91,7 @@ Player.prototype.send = function (COM , res , withoutCallback) {
     const mess_ID = this.numOfMess;
     if (withoutCallback) return this._send(COM , res , mess_ID ,  withoutCallback);
     this._send(COM , res , mess_ID, false).catch((e) => {
+        if (this.playerLeft) return
         console.log(`Promise TimeOut: ${mess_ID}`);
         this._addQueue( COM , res , mess_ID );
         this.setOnlineState(false);
@@ -103,7 +104,7 @@ Player.prototype._send = function (COM , res ,mess_ID , withoutCallback) {
     if (withoutCallback) return;
     return new Promise((resolve , reject) => {
         this.events.once(`messID_${mess_ID}` , resolve);
-        setTimeout(() => reject('Promise TimeOut') , 5000);
+        setTimeout(() => reject('Promise TimeOut') , 7000);
     });
 };
 
@@ -111,14 +112,19 @@ Player.prototype._addQueue = function ( COM , res , mess_ID) {
     if (this.messQueue.length > 100) this.messQueue.shift();
     this.messQueue.push({COM , res , mess_ID});
 };
-Player.prototype.delete = function(){
-    this.messQueue = [];
-    //this.events.emit('_resolveAllMess');
-};
+
 Player.prototype._setMeMaster = function(last_mess_id){
     console.log(`_setMeMaster ${last_mess_id}`);
     this.messQueue = this.messQueue.filter((mess) => mess.mess_ID >= last_mess_id);
     this._sendToMaster();
+};
+
+Player.prototype._removeListeners = function() {
+    this.playerLeft = true;
+    this.messQueue = [];
+    console.log(`_removeListeners`);
+    this.events.removeAllListeners();
+    this.socket.removeAllListeners()
 };
 
 

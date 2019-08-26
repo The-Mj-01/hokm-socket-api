@@ -32,7 +32,9 @@ function route( client , mess) {
 
 removeGame = function (room_id) {
     if(allGames[room_id]) {
+        allGames[room_id].removeListeners();
         delete allGames[room_id];
+
         console.log(`room_id removed`)
     }
 };

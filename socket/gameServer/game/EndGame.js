@@ -23,9 +23,7 @@ function run(e, mode, forceEndPlayer) {
         //console.log(data);
     });
 
-    e.players.toArray().map((p) => {
-        p.delete();
-    });
+
     removeGame(e.room_id);
 
 }

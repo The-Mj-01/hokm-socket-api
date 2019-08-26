@@ -6,15 +6,12 @@ import config from './config'
 import Debug from './Debug'
 import ui from "./ui";
 
-let room;
+const useUrl = false;
+const SOCKET_URL = useUrl ? 'online-hokm-game.herokuapp.com' : '';
 
-let nameSpace;
 let socket = null;
-let socket_ID = null;
-//const serverPort = 443;
 let last_mess_id = 0;
 const setIntervalTime = 15000;
-let lastCOM;
 let evenDisconnected = false;
 let pingTimeStart = null;
 let pinginterval = null;
@@ -43,7 +40,7 @@ const Game = {
 };
 
 function socketConnect() {
-    socket = socket_io('/Hokm', {
+    socket = socket_io(`${SOCKET_URL}/Hokm`, {
         reconnection: true,
         reconnectionDelay: 200,
         reconnectionDelayMax: 1000,
@@ -79,9 +76,7 @@ const connectTOS = function () {
     });
     socket.on('GAME', (mess) => {
         console.log(mess);
-        lastCOM = mess;
         if (mess.mess_ID) {
-            console.log(mess.mess_ID);
             const { mess_ID } = mess;
             if ((mess_ID - last_mess_id) === 1) {
                 socket.emit('_CALLBACK', mess_ID);
