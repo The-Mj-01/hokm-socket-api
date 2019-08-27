@@ -12,7 +12,9 @@ function run(e, mode, forceEndPlayer) {
         dataX = post_endGame(e , playerData);
 
     } else if (mode === 1) {
-        e.teamEmit("gameEnd", {player: {name: forceEndPlayer}} , true);
+        e.teamEmit("gameEnd", {player: {name: forceEndPlayer.name}} , true);
+        dataX = post_forceEndGame(e , playerData , forceEndPlayer);
+
 
     } else if (mode === 2) {
         e.teamEmit("gameEnd", true , true);
@@ -41,18 +43,18 @@ function post_endGame(e , PD) {
 
 }
 
-function post_forceEndGame(e, forceEndPlayer , PD) {
-    if (forceEndPlayer) {
+function post_forceEndGame(e, PD, forceEndPlayer) {
         return {
             mode: 1,
             gameType:e.gameType,
-            forceEndPlayer: forceEndPlayer,
-            room_id: e.Game,
+            forceEndPlayer: {
+                name: forceEndPlayer.name,
+                location: forceEndPlayer.location
+            },
+            room_id: e.room_id,
             players: PD,
             teamScore: e.roundteamScore
         }
-
-    }
 
 }
 
