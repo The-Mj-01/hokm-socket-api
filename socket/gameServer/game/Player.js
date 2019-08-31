@@ -54,7 +54,9 @@ Player.prototype.toView = function() {
   };
 };
 Player.prototype._sendToMaster = function() {
+  this._messQueueIndex();
   console.log(this.messQueue);
+
   const p = Promise.all(
     this.messQueue.map(mess =>
       this._pushEvent(mess.COM, mess.res, mess.mess_ID)
@@ -79,9 +81,11 @@ Player.prototype.send = function(COM, res, withoutCallback) {
 Player.prototype._pushEvent = function(COM, res, mess_ID) {
   this._send(COM, res, mess_ID, false).catch(e => {
     if (this.playerLeft) return;
-    console.log(`Promise TimeOut: ${mess_ID}`);
     this._addQueue(COM, res, mess_ID);
+    if (e === 1) return this._sendToMaster();
     this.setOnlineState(false);
+    console.log(`Promise TimeOut: ${mess_ID}`);
+
   });
 };
 Player.prototype._send = function(COM, res, mess_ID, withoutCallback) {
@@ -90,7 +94,13 @@ Player.prototype._send = function(COM, res, mess_ID, withoutCallback) {
   if (withoutCallback) return;
   return new Promise((resolve, reject) => {
     this.events.once(`messID_${mess_ID}`, resolve);
-    setTimeout(() => reject("Promise TimeOut"), 10000);
+    this.events.once(`_MESS_REJECT_${mess_ID}`, () => reject(1));
+
+    setTimeout(() => {
+      this.events.off(`messID_${mess_ID}`, resolve);
+      this.events.off(`_MESS_REJECT_${mess_ID}`, () => reject(1))
+      reject(0);
+    }, 10000);
   });
 };
 
@@ -99,20 +109,21 @@ Player.prototype._addQueue = function(COM, res, mess_ID) {
   this.messQueue.push({ COM, res, mess_ID });
 };
 
+Player.prototype._messQueueIndex = function(maxMessId){
+  if (maxMessId) this.messQueue = this.messQueue.filter(mess => mess.mess_ID > maxMessId);
+  this.messQueue = this.messQueue.sort((a , b) => a.mess_ID - b.mess_ID);
+}
+
 Player.prototype._MessLost = function(last_mess_id) {
-  console.log(`_MessLost ${last_mess_id}`);
-  this._getCallback(last_mess_id);
+  console.log(`${this.name} _MessLost ${last_mess_id}`);
+  this._messQueueIndex(last_mess_id);
   this._sendToMaster();
 };
 
-Player.prototype._getCallback = function(last_mess_id) {
-  this.messQueue = this.messQueue.filter(mess => mess.mess_ID > last_mess_id);
-};
 
 Player.prototype._removeListeners = function() {
   this.playerLeft = true;
   this.messQueue = [];
-  console.log(`_removeListeners`);
   this.events.removeAllListeners();
   this.socket.removeAllListeners();
 };
@@ -127,9 +138,9 @@ Player.prototype.setGameEvents = function() {
     Game._forceEndGame(this);
   });
   this.events.on("_CALLBACK", ID => {
+    this._messQueueIndex(ID);
     this.setOnlineState(true);
     this.events.emit(`messID_${ID}`, true);
-    this._getCallback(ID);
   });
   this.events.on("pingT", () => this.setOnlineState(true));
   this.events.on("_MessLost", last_messID => this._MessLost(last_messID));
@@ -149,7 +160,11 @@ const setEvents = (socket, events, game) => {
   socket.on("pingT", () => events.emit("pingT"));
   socket.on("error", r => events.emit("error", r));
   socket.on("_CALLBACK", r => events.emit("_CALLBACK", r));
-  socket.on("_MessLost", last_messID => events.emit("_MessLost", last_messID));
+  socket.on("_MESS_REJECT", ({ last_mess_id , mess_ID }) => {
+    events.emit("_MessLost", last_mess_id)
+    events.emit(`_MESS_REJECT_${mess_ID}`)
+
+  });
 };
 
 module.exports = Player;

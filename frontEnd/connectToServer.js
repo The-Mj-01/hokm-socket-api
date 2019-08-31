@@ -17,7 +17,6 @@ let pingTimeStart = null;
 let pinginterval = null;
 let pingResp = true;
 let token;
-
 const pingTimeDom = $("#pingTime");
 
 const Game = {
@@ -81,7 +80,7 @@ const connectTOS = function() {
         last_mess_id = mess_ID;
       } else {
         console.warn("bad mess ID", { last_mess_id, mess_ID });
-        return socket.emit("_MessLost", last_mess_id);
+        return socket.emit("_MESS_REJECT", { last_mess_id , mess_ID});
       }
     }
     game_core(mess);
