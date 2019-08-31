@@ -1,13 +1,13 @@
-import socket_io from './socket_io'
-import loadingPage from './loadingPage'
-import NamePage from './NamePage'
-import game_core from './game_core'
-import config from './config'
-import Debug from './Debug'
+import socket_io from "./socket_io";
+import loadingPage from "./loadingPage";
+import NamePage from "./NamePage";
+import game_core from "./game_core";
+import config from "./config";
+import Debug from "./Debug";
 import ui from "./ui";
 
 const useUrl = false;
-const SOCKET_URL = useUrl ? 'online-hokm-game.herokuapp.com' : '';
+const SOCKET_URL = useUrl ? "online-hokm-game.herokuapp.com" : "";
 
 let socket = null;
 let last_mess_id = 0;
@@ -18,148 +18,138 @@ let pinginterval = null;
 let pingResp = true;
 let token;
 
-
 const pingTimeDom = $("#pingTime");
 
-
 const Game = {
-    connect: function() {
-        const url = new URL(document.location.href);
-        this.userName = this.userName || url.searchParams.get('userName');
-        if (!this.userName) return NamePage();
-        this.id = url.searchParams.get('id');
-        this.game_id = url.searchParams.get('game') || undefined;
-        this.rounds = parseInt(url.searchParams.get('rounds')) || undefined;
+  connect: function() {
+    const url = new URL(document.location.href);
+    this.userName = this.userName || url.searchParams.get("userName");
+    if (!this.userName) return NamePage();
+    this.id = url.searchParams.get("id");
+    this.game_id = url.searchParams.get("game") || undefined;
+    this.rounds = parseInt(url.searchParams.get("rounds")) || undefined;
 
-        connectTOS();
-    },
-    setName: function(name) {
-        this.userName = name;
-        this.connect();
-    }
+    connectTOS();
+  },
+  setName: function(name) {
+    this.userName = name;
+    this.connect();
+  }
 };
 
 function socketConnect() {
-    socket = socket_io(`${SOCKET_URL}/Hokm`, {
-        reconnection: true,
-        reconnectionDelay: 200,
-        reconnectionDelayMax: 1000,
-        transports: ['websocket']
-    });
-    socket.heartbeatTimeout = 5000;
-    return socket
+  socket = socket_io(`${SOCKET_URL}/Hokm`, {
+    reconnection: true,
+    reconnectionDelay: 200,
+    reconnectionDelayMax: 1000,
+    transports: ["websocket"]
+  });
+  socket.heartbeatTimeout = 5000;
+  return socket;
 }
 
-
-
 const join_room = () => {
-    const { id , userName , game_id , rounds } = Game;
-    socket.emit('JOIN_ME', {id, userName , game_id , rounds});
-    $('#login_page').removeClass('show').addClass('hide');
-    ui.showMessage("تا رسیدن بقیه بازیکن ها صبر کنید.");
-    loadingPage.load(true);
+  const { id, userName, game_id, rounds } = Game;
+  socket.emit("JOIN_ME", { id, userName, game_id, rounds });
+  $("#login_page")
+    .removeClass("show")
+    .addClass("hide");
+  ui.showMessage("تا رسیدن بقیه بازیکن ها صبر کنید.");
+  loadingPage.load(true);
 };
-const connectTOS = function () {
-    socket = socketConnect();
-    window.socket = socket;
-    socket.on("connect", onConnect);
-    socket.on("disconnect", (r) => {
-        pingTimeDom.html("Disconnected !");
-        evenDisconnected = true;
-        console.log("socket disconnect", r);
-        Debug.log("disconnect")
-    });
-    socket.on('config', (mess) => {
-        console.log('config', mess);
-        config.setRoom_id(mess.room_id);
-        config.setLocation(mess.location);
-    });
-    socket.on('GAME', (mess) => {
-        console.log(mess);
-        if (mess.mess_ID) {
-            const { mess_ID } = mess;
-            if ((mess_ID - last_mess_id) === 1) {
-                socket.emit('_CALLBACK', mess_ID);
-                last_mess_id = mess_ID;
-            } else {
-                socket.emit('_setMeMaster' , last_mess_id);
-                console.warn('bad mess ID' , { last_mess_id , mess_ID});
-            }
-        }
-        game_core(mess);
-        Debug.log("GAME", mess)
-    });
-    socket.on('connect_error', (error) => console.log('connect_error', error)
-    );
-    socket.on('error', (error) => {
-        console.log('error', error);
-        Debug.log("socket error", error);
-    });
-    socket.on('connect_timeout', (error) => console.log('connect_timeout', error));
-    socket.on('reconnect', (x) => console.log('reconnect', x));
-    socket.on('reconnecting', (x) => console.log('reconnecting', x));
-    socket.on('reconnect_error', (x) => console.log('reconnect_error', x));
-    socket.on('reconnect_failed', (x) => console.log('reconnect_failed', x));
-    socket.on('S_ERR', (res) => game_core({COM:'alert' ,res }));
-    socket.on('setSocketID', (id) => socket_ID = id);
-    socket.on('room_id', (room_id) => room = room_id);
-    socket.on('pongT', () => {
-        pingResp = true;
-        let newTime = new Date().getTime();
-        let pingTime = newTime - pingTimeStart;
-        updatePingDom(pingTime + " ms");
-    });
-    socket.on('debug', (m) => {
-        console.log('deb', m);
-        Debug.log("deb", m)
-    });
-    socket.on('token', (t) => token = t)
+const connectTOS = function() {
+  socket = socketConnect();
+  window.socket = socket;
+  socket.on("connect", onConnect);
+  socket.on("disconnect", r => {
+    pingTimeDom.html("Disconnected !");
+    evenDisconnected = true;
+    console.log("socket disconnect", r);
+    Debug.log("disconnect");
+  });
+  socket.on("config", mess => {
+    console.log("config", mess);
+    config.setRoom_id(mess.room_id);
+    config.setLocation(mess.location);
+  });
+  socket.on("GAME", mess => {
+    console.log(mess);
+    if (mess.mess_ID) {
+      const { mess_ID } = mess;
+      if (mess_ID - last_mess_id === 1) {
+        socket.emit("_CALLBACK", mess_ID);
+        last_mess_id = mess_ID;
+      } else {
+        console.warn("bad mess ID", { last_mess_id, mess_ID });
+        return socket.emit("_MessLost", last_mess_id);
+      }
+    }
+    game_core(mess);
+    Debug.log("GAME", mess);
+  });
+  socket.on("connect_error", error => console.log("connect_error", error));
+  socket.on("error", error => {
+    console.log("error", error);
+    Debug.log("socket error", error);
+  });
+  socket.on("connect_timeout", error => console.log("connect_timeout", error));
+  socket.on("reconnect", x => console.log("reconnect", x));
+  socket.on("reconnecting", x => console.log("reconnecting", x));
+  socket.on("reconnect_error", x => console.log("reconnect_error", x));
+  socket.on("reconnect_failed", x => console.log("reconnect_failed", x));
+  socket.on("S_ERR", res => game_core({ COM: "alert", res }));
+  socket.on("setSocketID", id => (socket_ID = id));
+  socket.on("room_id", room_id => (room = room_id));
+  socket.on("pongT", () => {
+    pingResp = true;
+    let newTime = new Date().getTime();
+    let pingTime = newTime - pingTimeStart;
+    updatePingDom(pingTime + " ms");
+  });
+  socket.on("debug", m => {
+    console.log("deb", m);
+    Debug.log("deb", m);
+  });
+  socket.on("token", t => (token = t));
 };
 
 function onConnect() {
-    Debug.log("connected");
-    pingTimeDom.html("Connected");
-    if (token) socket.emit('token', token);
-    else if (!evenDisconnected) join_room();
-    else alert("اتصال شما با سرور ناپایدار است.");
-    window.gameEmitor = function (COM, res) {
-        if (!socket.connected) return alert('اتصال شما با سرور قطع شده است');
-        socket.emit('GAME', {
-            COM,
-            res
-        });
-    };
-    loadingPage.errBoxRemove();
-    if (pinginterval) clearInterval(pinginterval);
-    pinginterval = setInterval(ping, setIntervalTime);
-
+  Debug.log("connected");
+  pingTimeDom.html("Connected");
+  if (token) socket.emit("token", token);
+  else if (!evenDisconnected) join_room();
+  else alert("اتصال شما با سرور ناپایدار است.");
+  window.gameEmitor = function(COM, res) {
+    if (!socket.connected) return alert("اتصال شما با سرور قطع شده است");
+    socket.emit("GAME", {
+      COM,
+      res
+    });
+  };
+  loadingPage.errBoxRemove();
+  if (pinginterval) clearInterval(pinginterval);
+  pinginterval = setInterval(ping, setIntervalTime);
 }
 
-
 function ping() {
-    if (!pingResp) updatePingDom("Time Out!!");
-    pingResp = false;
-    pingTimeStart = new Date().getTime();
-    socket.emit('pingT', true);
+  if (!pingResp) updatePingDom("Time Out!!");
+  pingResp = false;
+  pingTimeStart = new Date().getTime();
+  socket.emit("pingT", true);
 }
 
 function updatePingDom(ping) {
-    pingTimeDom.html(ping);
+  pingTimeDom.html(ping);
 }
 
-pingTimeDom.on('click', () => {
-    window.socket.emit("debug");
-    Debug.show()
-
+pingTimeDom.on("click", () => {
+  window.socket.emit("debug");
+  Debug.show();
 });
 
-export default function () {
-    Game.connect();
+export default function() {
+  Game.connect();
 }
-export const setName = function (name){
-    Game.setName(name);
+export const setName = function(name) {
+  Game.setName(name);
 };
-
-
-        
-
