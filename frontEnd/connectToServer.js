@@ -7,7 +7,7 @@ import Debug from "./Debug";
 import ui from "./ui";
 
 const useUrl = false;
-const SOCKET_URL = useUrl ? "online-hokm-game.herokuapp.com" : "";
+const SOCKET_URL = useUrl ? 'ws://95.216.106.170' : '';
 
 let socket = null;
 let last_mess_id = 0;
