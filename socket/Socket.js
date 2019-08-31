@@ -1,5 +1,4 @@
 const namespaces = require('./Namespaces');
-const port = require('../glob_var').app.ports.socket;
 const io = require('./io');
 
 module.exports = (server) => {

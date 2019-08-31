@@ -177,10 +177,8 @@ Game.prototype.setUpdate = function() {
   this.lastActivity = Date.now();
   setTimeout(() => {
     if (Date.now() - this.lastActivity < maxTimeWithoutActivity) return;
-    console.log(Date.now() - this.lastActivity);
-
     if (!this._isGameStarted) return;
-    endGame(this, 2, player);
+    endGame(this, 2, this.waitingForPlayer);
   }, maxTimeWithoutActivity + 1000);
 };
 

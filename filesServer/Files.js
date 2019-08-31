@@ -15,7 +15,7 @@ module.exports = () => {
     const httpServer = http.createServer(app);
     siteRouter(app);
     httpServer.listen(port,()=>{
-        console.log('httpServer RUNNING');
+        console.log(`httpServer RUNNING on ${port}`);
     });
     return httpServer;
 };
