@@ -1,17 +1,17 @@
-const Player = require("./Player");
-const cardPick = require("./CardPick");
-const endGame = require("./EndGame");
-const io = require("../../io");
-const chat = require("./chat");
-const { toNum } = require("./Location");
+const Player = require('./Player');
+const cardPick = require('./CardPick');
+const endGame = require('./EndGame');
+const io = require('../../io');
+const chat = require('./chat');
+const { toNum } = require('./Location');
 const maxTimeWithoutActivity = 100 * 1000;
 
 const routes = {
-  start: require("./gameStart"),
-  newRound: require("./Round").newRound,
-  setHakem: require("./SetHakem"),
-  newPreRound: require("./PreRound"),
-  onHokmSeted: require("./Round").onHokmSet
+  start: require('./gameStart'),
+  newRound: require('./Round').newRound,
+  setHakem: require('./SetHakem'),
+  newPreRound: require('./PreRound'),
+  onHokmSeted: require('./Round').onHokmSet
 };
 
 Game = function(room_id, roomData) {
@@ -38,7 +38,7 @@ Game = function(room_id, roomData) {
 
   this.rounds = roomData.rounds;
   this.gameType = roomData.type;
-  this.namespace = "Hokm";
+  this.namespace = 'Hokm';
   this.preRoundteamScore = {
     topB: 0,
     rightL: 0
@@ -50,7 +50,7 @@ Game = function(room_id, roomData) {
   this._isGameStarted = false;
   this.isHokmSet = false;
   this.cards = [];
-  this.status = "start";
+  this.status = 'start';
   this.preRoundPlayerNum = 0;
   this.preRoundGame = [];
   this.numofPlayers = 0;
@@ -60,7 +60,7 @@ Game = function(room_id, roomData) {
 
 Game.prototype.emit = function(x, y) {
   // todo: remove
-  io.of("/globalHokm")
+  io.of('/globalHokm')
     .in(this.room_id)
     .emit(x, y);
 };
@@ -73,25 +73,25 @@ Game.prototype.addplayer = function(socket, location, playerData) {
   if (this.players[location]) this.players[location].setupNewSocket(socket);
   else {
     if (this.players.toArray().length === 4) {
-      socket.emit("S_ERR", "GAME IS FULL");
+      socket.emit('S_ERR', 'GAME IS FULL');
       socket.disconnect();
     }
     this.numofPlayers++;
     const player = new Player(socket, location, this, name, tgID);
     this.players[location] = player;
     const onlines = this.numofPlayers;
-    if (onlines < 4) this.teamEmit("newPlayer", { name, length: onlines });
-    player.events.once("disconnect", () => {
+    if (onlines < 4) this.teamEmit('newPlayer', { name, length: onlines });
+    player.events.once('disconnect', () => {
       if (!this._isGameStarted) {
         this.numofPlayers--;
         delete this.players[location];
-        this.teamEmit("leftPlayer", { name, length: this.numofPlayers });
+        this.teamEmit('leftPlayer', { name, length: this.numofPlayers });
       }
     });
     if (!this._isGameStarted && this.players.toArray().length >= 4) {
       this._isGameStarted = true;
       this.setUpdate();
-      this.run("start");
+      this.run('start');
     }
   }
 };
@@ -102,7 +102,7 @@ Game.prototype.teamEmit = function(COM, res, withoutCB) {
 };
 Game.prototype.run = function(status) {
   if (status) this.status = status;
-  if (typeof routes[this.status] === "function") routes[this.status](this);
+  if (typeof routes[this.status] === 'function') routes[this.status](this);
 };
 Game.prototype.setStatus = function(status) {
   if (status) this.status = status;
@@ -111,7 +111,7 @@ Game.prototype.setStatus = function(status) {
 Game.prototype.setHokm = async function(hokm) {
   this.hokm = hokm;
   if (this.hokm && this.hakem) {
-    await this.teamEmit("setHokm", this.hakem);
+    await this.teamEmit('setHokm', this.hakem);
   }
 };
 Game.prototype.sendChat = function(chatMess, location) {
@@ -121,10 +121,10 @@ Game.prototype._setHokmEvent = async function(hokm, emit) {
   if (hokm && !this.isHokmSet) {
     this.isHokmSet = true;
     this.hokm = hokm;
-    if (emit) await this.teamEmit("hokmSeted", hokm);
-    this.run("onHokmSeted");
+    if (emit) await this.teamEmit('hokmSeted', hokm);
+    this.run('onHokmSeted');
   } else {
-    console.log("bad status");
+    console.log('bad status');
     console.log(this.status);
   }
 };
@@ -146,7 +146,7 @@ Game.prototype._pickCard = function(card, location) {
 };
 Game.prototype.hook = function(id, mess) {
   const { COM } = mess;
-  if (COM === "JOIN_ME") this._joinOfflinePlayer(mess.res);
+  if (COM === 'JOIN_ME') this._joinOfflinePlayer(mess.res);
 };
 
 Game.prototype.getRoundPlayed = function() {
@@ -169,8 +169,14 @@ Game.prototype.getEmptyLocations = function() {
 };
 
 Game.prototype.removeListeners = function() {
-  console.log("____removeListeners");
+  console.log('____removeListeners');
   this.players.toArray().forEach(p => p._removeListeners());
+};
+
+Game.prototype.internalServerError = function(error) {
+  console.log(error);
+  this.teamEmit('alert', error);
+  endGame(this, 0);
 };
 
 Game.prototype.setUpdate = function() {
