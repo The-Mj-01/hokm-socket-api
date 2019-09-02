@@ -11,11 +11,10 @@ Player = function(scoket, location, Game, name, tgID) {
   this.cards = [];
   this.isTurn = false;
   this.playerLeft = false;
-  this.on = this.events.on;
-  this.once = this.events.once;
   this.numOfMess = 0;
   this._isOnline = true;
   this.messQueue = [];
+  this._socketHealth = true;
   this.isWaitingForCB = false;
   this.setGameEvents();
   this.setupNewSocket(scoket);
@@ -44,6 +43,7 @@ Player.prototype.setOnlineState = function(state) {
   } else if (!state && this._isOnline)
     this.Game.teamEmit('player_disconnect', { location }, true);
   this._isOnline = state;
+  this._socketHealth = state;
 };
 
 Player.prototype.toView = function() {
@@ -78,8 +78,13 @@ Player.prototype.send = function(COM, res, withoutCallback) {
   this._pushEvent(COM, res, mess_ID);
 };
 Player.prototype._pushEvent = function(COM, res, mess_ID) {
+  if (!this._socketHealth) {
+    console.log(`socketHealth:false ${mess_ID} for ${this.name}`);
+    return this._addQueue(COM, res, mess_ID);
+  }
   this._send(COM, res, mess_ID, false).catch(e => {
     if (this.playerLeft) return;
+    this._socketHealth = false;
     this._addQueue(COM, res, mess_ID);
     if (e === 1) return this._sendToMaster();
     this.setOnlineState(false);
@@ -95,8 +100,8 @@ Player.prototype._send = function(COM, res, mess_ID, withoutCallback) {
     this.events.once(`_MESS_REJECT_${mess_ID}`, () => reject(1));
 
     setTimeout(() => {
-      this.events.off(`messID_${mess_ID}`, resolve);
-      this.events.off(`_MESS_REJECT_${mess_ID}`, () => reject(1));
+      this.events.removeListener(`messID_${mess_ID}`, resolve);
+      this.events.removeListener(`_MESS_REJECT_${mess_ID}`, () => reject(1));
       reject(0);
     }, 10000);
   });
@@ -143,7 +148,16 @@ Player.prototype.setGameEvents = function() {
     this.setOnlineState(true);
     this.events.emit(`messID_${ID}`, true);
   });
-  this.events.on('pingT', () => this.setOnlineState(true));
+  this.events.on('pingT', (last_mess_id) => {
+    this.setOnlineState(true);
+    this._messQueueIndex(last_mess_id);
+    // console.log(last_mess_id)
+    // console.log(this.messQueue)
+    if (this.messQueue) {
+      console.log('pus master via ping');
+      this._sendToMaster(); 
+    }
+  });
   this.events.on('_MessLost', last_messID => this._MessLost(last_messID));
 };
 
@@ -158,7 +172,7 @@ const setEvents = (socket, events, game) => {
     events.emit(COM, res);
   });
   socket.on('disconnect', r => events.emit('disconnect', r));
-  socket.on('pingT', () => events.emit('pingT'));
+  socket.on('pingT', (last_mess_id) => events.emit('pingT' , last_mess_id));
   socket.on('error', r => events.emit('error', r));
   socket.on('_CALLBACK', r => events.emit('_CALLBACK', r));
   socket.on('_MESS_REJECT', ({ last_mess_id, mess_ID }) => {

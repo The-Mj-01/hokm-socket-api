@@ -48,6 +48,7 @@ Game = function(room_id, roomData) {
     rightL: 0
   };
   this._isGameStarted = false;
+  this._isGameFinished = false;
   this.isHokmSet = false;
   this.cards = [];
   this.status = 'start';

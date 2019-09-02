@@ -3,6 +3,8 @@ const url = require("../../../glob_var").app.hook_url;
 const removeGame = require("../gamesManager").removeGame;
 
 function run(e, mode, forceEndPlayer) {
+  if (e._isGameFinished) return
+  e._isGameFinished = true;
   let dataX = null;
   const playerData = daleteBadPlayersData(e);
 

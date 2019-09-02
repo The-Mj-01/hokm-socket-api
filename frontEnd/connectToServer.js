@@ -6,12 +6,14 @@ import config from "./config";
 import Debug from "./Debug";
 import ui from "./ui";
 
+console.log('v2')
+
 const useUrl = false;
 const SOCKET_URL = useUrl ? 'ws://95.216.106.170' : '';
 
 let socket = null;
 let last_mess_id = 0;
-const setIntervalTime = 15000;
+const setIntervalTime = 5000;
 let evenDisconnected = false;
 let pingTimeStart = null;
 let pinginterval = null;
@@ -134,7 +136,7 @@ function ping() {
   if (!pingResp) updatePingDom("Time Out!!");
   pingResp = false;
   pingTimeStart = new Date().getTime();
-  socket.emit("pingT", true);
+  socket.emit("pingT", last_mess_id);
 }
 
 function updatePingDom(ping) {
