@@ -23,7 +23,7 @@ async function run(e) {
 
     winner.location === 2||winner.location=== 0 ? e.preRoundteamScore.topB++ : e.preRoundteamScore.rightL++;
 
-    await e.teamEmit('toWaste',{
+    await e.teamPush('toWaste',{
         location:winner.location,
         card:winner.card
     });

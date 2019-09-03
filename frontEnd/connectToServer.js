@@ -75,18 +75,19 @@ const connectTOS = function() {
   });
   socket.on("GAME", mess => {
     console.log(mess);
+    Debug.log("GAME", mess);
+
     if (mess.mess_ID) {
       const { mess_ID } = mess;
-      if (mess_ID - last_mess_id === 1) {
-        socket.emit("_CALLBACK", mess_ID);
-        last_mess_id = mess_ID;
-      } else {
+      if (mess_ID - last_mess_id === 1) last_mess_id = mess_ID;
+      else {
+        updatePingDom('Connecting...');
         console.warn("bad mess ID", { last_mess_id, mess_ID });
-        return socket.emit("_MESS_REJECT", { last_mess_id , mess_ID});
+        (mess_ID > last_mess_id)  ? ping() : undefined
+        return;
       }
     }
     game_core(mess);
-    Debug.log("GAME", mess);
   });
   socket.on("connect_error", error => console.log("connect_error", error));
   socket.on("error", error => {
@@ -103,8 +104,7 @@ const connectTOS = function() {
   socket.on("room_id", room_id => (room = room_id));
   socket.on("pongT", () => {
     pingResp = true;
-    let newTime = new Date().getTime();
-    let pingTime = newTime - pingTimeStart;
+    const pingTime = Date.now() - pingTimeStart;
     updatePingDom(pingTime + " ms");
   });
   socket.on("debug", m => {

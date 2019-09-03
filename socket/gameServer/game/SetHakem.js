@@ -14,7 +14,7 @@ async function run(e) {
        const { bored , i , players} = getCardsToSetHakem(e);
        const hakem = players[i % 4];
        e.hakem = hakem;
-       await e.teamEmit('setHakem', {
+       await e.teamPush('setHakem', {
            roundOne:true, cards: bored, i: i, hakem: hakem.toView(), start: players[0].toView(),
        });
 
@@ -33,7 +33,7 @@ async function run(e) {
 async function setNewHakem(e){
     const newHakemLoc = nextof(e.hakem.location,1);
     e.hakem = e.players[newHakemLoc];
-    await e.teamEmit('setHakem', {
+    await e.teamPush('setHakem', {
         roundOne:false, hakem: e.hakem.toView(),
     });
 }

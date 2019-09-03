@@ -10,7 +10,7 @@ async function nextPlayer(e) {
     player.isTurn = false;
     e._pickCard(card, player.location, player);
   });
-  await e.teamEmit("setTurn", {
+  await e.teamPush("setTurn", {
     player: player.toView(),
     suit: e.table.suit
   });

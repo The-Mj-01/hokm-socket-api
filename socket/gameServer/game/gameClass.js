@@ -81,12 +81,12 @@ Game.prototype.addplayer = function(socket, location, playerData) {
     const player = new Player(socket, location, this, name, tgID);
     this.players[location] = player;
     const onlines = this.numofPlayers;
-    if (onlines < 4) this.teamEmit('newPlayer', { name, length: onlines });
+    if (onlines < 4) this.teamSend('newPlayer', { name, length: onlines });
     player.events.once('disconnect', () => {
       if (!this._isGameStarted) {
         this.numofPlayers--;
         delete this.players[location];
-        this.teamEmit('leftPlayer', { name, length: this.numofPlayers });
+        this.teamSend('leftPlayer', { name, length: this.numofPlayers });
       }
     });
     if (!this._isGameStarted && this.players.toArray().length >= 4) {
@@ -97,9 +97,14 @@ Game.prototype.addplayer = function(socket, location, playerData) {
   }
 };
 
-Game.prototype.teamEmit = function(COM, res, withoutCB) {
-  console.log(`TEAM ${COM} | ${JSON.stringify(res)} | ${withoutCB}`.white);
-  this.players.toArray().map(p => p.send(COM, res, withoutCB));
+Game.prototype.teamSend = function(COM, res) {
+  console.log(`TEAM SEND ${COM} | ${JSON.stringify(res)}`);
+  this.players.toArray().map(p => p.send(COM, res));
+};
+
+Game.prototype.teamPush = function(COM, res) {
+  console.log(`TEAM Push ${COM} | ${JSON.stringify(res)}`);
+  this.players.toArray().map(p => p.pushEvent(COM, res));
 };
 Game.prototype.run = function(status) {
   if (status) this.status = status;
@@ -112,7 +117,7 @@ Game.prototype.setStatus = function(status) {
 Game.prototype.setHokm = async function(hokm) {
   this.hokm = hokm;
   if (this.hokm && this.hakem) {
-    await this.teamEmit('setHokm', this.hakem);
+    await this.teamPush('setHokm', this.hakem);
   }
 };
 Game.prototype.sendChat = function(chatMess, location) {
@@ -122,7 +127,7 @@ Game.prototype._setHokmEvent = async function(hokm, emit) {
   if (hokm && !this.isHokmSet) {
     this.isHokmSet = true;
     this.hokm = hokm;
-    if (emit) await this.teamEmit('hokmSeted', hokm);
+    if (emit) await this.teamPush('hokmSeted', hokm);
     this.run('onHokmSeted');
   } else {
     console.log('bad status');
@@ -176,7 +181,7 @@ Game.prototype.removeListeners = function() {
 
 Game.prototype.internalServerError = function(error) {
   console.log(error);
-  this.teamEmit('alert', error);
+  this.teamPush('alert', error);
   endGame(this, 0);
 };
 
