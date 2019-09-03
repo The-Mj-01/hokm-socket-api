@@ -5,6 +5,7 @@ const PreRound = require('./PreRound');
 const setNewHakem = require('./SetHakem');
 const timeout = ms => new Promise(res => setTimeout(res, ms));
 const sendScore = require('./SendScore');
+const setPlayerCards = require('./setPlayersCards');
 const globalRounds = require('../../../glob_var').game.globalRounds;
 
 newRound = async function(e) {
@@ -12,6 +13,7 @@ newRound = async function(e) {
    e.renewPreRoundScore();
    sendScore(e);
    e.cards = shuffleCards();
+   setPlayerCards(e);
    await timeout(1500);
    heyHakemSetHokm(e);
    e.isHokmSet = false;
@@ -50,11 +52,9 @@ onRoundEnd = function(e) {
       if (e.preRoundteamScore.rightL === 0 || e.preRoundteamScore.topB === 0)
          if (roundWinner === 'topB' || roundWinner === 'rightL')
             if (e.hakem.location === 2 || e.hakem.location === 0) {
-               if (roundWinner === 'topB') e.roundteamScore.topB++;
-               else if (roundWinner === 'rightL') e.roundteamScore.rightL += 2;
+               roundWinner === 'topB' ? e.roundteamScore.topB++ : e.roundteamScore.rightL += 2;
             } else if (e.hakem.location === 3 || e.hakem.location === 1) {
-               if (roundWinner === 'rightL') e.roundteamScore.rightL++;
-               else if (roundWinner === 'topB') e.roundteamScore.topB += 2;
+               roundWinner === 'rightL' ? e.roundteamScore.rightL++ : e.roundteamScore.topB += 2;
             }
    }
 };

@@ -16,6 +16,7 @@
     "express": "^4.16.4",
     "jsonwebtoken": "^8.5.1",
     "nodemon": "^1.18.10",
+    "ramda": "^0.26.1",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {

@@ -5,25 +5,29 @@ async function emit(e, mess, location) {
    await e.teamPush('playerPickCard', mess);
 }
 
-async function run(e, res, location) {
-   async function add() {
-      e.table.getTurnPlayer().card = res.card;
+async function run(e, card, location) {
+   async function add(player) {
+      player.card = card;
+      player.cards = player.cards.filter((c) => c.id !== card.id);
       e.table.preRound++;
-      await emit(e, res, location);
+      await emit(e, { card }, location);
       onPlayerPick(e);
    }
 
+   const player = e.table.getTurnPlayer();
+   if (!player) return console.log('alert no player');
+   if (!player.cards.map(c => c.id).includes(card.id)) return
    if (typeof e.table.suit === 'undefined') {
       // don't use !e.table.suit
-      e.table.suit = res.card.suit;
-      res.card.hasSuit = true;
-      await add();
+      e.table.suit = card.suit;
+      card.hasSuit = true;
+      await add(player);
    } else {
-      if (res.card.suit === e.table.suit) await add();
-      else if (res.card.hasSuit === false) await add();
+      if (card.suit === e.table.suit) await add(player);
+      else if (card.hasSuit === false) await add(player);
       else {
          console.log('WTF 1'.yellow);
-         console.log(JSON.stringify(res));
+         console.log(JSON.stringify(card));
       }
    }
 }

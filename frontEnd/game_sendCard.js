@@ -22,12 +22,6 @@ export default function (cards, nc, game) {
             }
          }
       );
-
-      yourCard.forEach((card) => {
-         card.display.setSelectable(false);
-         card.display.grayScale(false);
-
-      });
       return true;
 
    } else {

@@ -2,14 +2,20 @@ const { nextof } = require("./Location");
 const EndPreRound = require("./EndPreRound");
 const timeout = ms => new Promise(res => setTimeout(res, ms));
 const Round = require("./Round");
+const autoPick = require('./autoCardPick');
 
 async function nextPlayer(e) {
   const player = e.table.getTurnPlayer();
   e.waitingForPlayer = player;
-  player.events.once("pickCard", card => {
+
+  const autoPickTimeout = setTimeout(() => autoPick(e , player) , 9000)
+
+  player.events.once("pickCard", mess => {
+    clearTimeout(autoPickTimeout);
     player.isTurn = false;
-    e._pickCard(card, player.location, player);
+    e._pickCard(mess.card, player.location, player);
   });
+
   await e.teamPush("setTurn", {
     player: player.toView(),
     suit: e.table.suit

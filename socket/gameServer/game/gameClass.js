@@ -6,6 +6,9 @@ const chat = require('./chat');
 const { toNum } = require('./Location');
 const maxTimeWithoutActivity = 100 * 1000;
 
+const hokmString = { pik: 0, del: 1, gish: 2, khesht: 3 };
+
+
 const routes = {
   start: require('./gameStart'),
   newRound: require('./Round').newRound,
@@ -126,7 +129,7 @@ Game.prototype.sendChat = function(chatMess, location) {
 Game.prototype._setHokmEvent = async function(hokm, emit) {
   if (hokm && !this.isHokmSet) {
     this.isHokmSet = true;
-    this.hokm = hokm;
+    this.hokm = hokmString[hokm];
     if (emit) await this.teamPush('hokmSeted', hokm);
     this.run('onHokmSeted');
   } else {

@@ -195,8 +195,18 @@ const game_setTurn = function(mess) {
 };
 const playerPickCard = function(mess) {
    let playerLoc = config.getLocOfPlayers({ location: mess.location });
+   console.log(playerLoc)
 
    let player = game.run.getPlayers()[playerLoc];
+   const me = game.run.getPlayers()[0];
+   if (playerLoc === 0) {
+      console.log(me.row.cards);
+      me.row.cards.forEach(card => {
+         card.display.setSelectable(false);
+         card.display.grayScale(false);
+      });
+   }
+
    let cards = player.row.cards;
    const [card] = cards.filter(c => c.id === mess.card.id);
    if (card) {

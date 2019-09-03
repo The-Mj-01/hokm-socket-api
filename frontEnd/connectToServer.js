@@ -6,7 +6,7 @@ import config from "./config";
 import Debug from "./Debug";
 import ui from "./ui";
 
-console.log('v2')
+console.log('v3');
 
 const useUrl = false;
 const SOCKET_URL = useUrl ? 'ws://95.216.106.170' : '';
@@ -20,6 +20,8 @@ let pinginterval = null;
 let pingResp = true;
 let token;
 const pingTimeDom = $("#pingTime");
+pingTimeDom.html('V3');
+
 
 const Game = {
   connect: function() {
