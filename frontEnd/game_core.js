@@ -24,10 +24,7 @@ testBut.click(() => {
 });
 
 function send_hokm(hokm) {
-   if (window.socket.connected) {
-      window.gameEmitor('setHokm', { hokm });
-      setHokmDOM.removeClass('show').addClass('hide');
-   }
+   window.gameEmitor('setHokm', { hokm });
 }
 
 // const resolveNextCOM = function () {
@@ -134,20 +131,20 @@ const game_newRound = function(mess) {
    }
 };
 const game_setHokm = function(mess) {
-   if (mess) {
-      ui.hideMessage();
-      const pos = config.getLocOfPlayers(mess);
-      if (pos === 0) setHokmDOM.removeClass('hide').addClass('show');
-   }
+   ui.hideMessage();
+   const pos = config.getLocOfPlayers(mess);
+   if (pos === 0) setHokmDOM.removeClass('hide').addClass('show');
 };
 const game_hokmSeted = function(mess) {
    setHokmDOM.removeClass('show').addClass('hide');
+   
    const x = {
       khesht: 'حکم خشت',
       pik: 'حکم پیک',
       del: 'حکم دل',
       gish: 'حکم گیشنیز'
    };
+
    hokm_icon
       .removeClass()
       .addClass('hokm_icon')
@@ -195,7 +192,7 @@ const game_setTurn = function(mess) {
 };
 const playerPickCard = function(mess) {
    let playerLoc = config.getLocOfPlayers({ location: mess.location });
-   console.log(playerLoc)
+   console.log(playerLoc);
 
    let player = game.run.getPlayers()[playerLoc];
    const me = game.run.getPlayers()[0];

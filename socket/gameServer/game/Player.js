@@ -40,9 +40,12 @@ Player.prototype.setOnlineState = function(state) {
    if (state && !this._isOnline) {
       this._sendToMaster();
       this.Game.teamPush('player_connect', { location }, true);
-   } else if (!state && this._isOnline)
+   } else if (!state && this._isOnline) {
       this.Game.teamPush('player_disconnect', { location }, true);
+   }
+
    this._isOnline = state;
+   if (!this._isOnline) this.Game._onPlayerDisconnect();
 };
 
 Player.prototype.toView = function() {
@@ -103,7 +106,9 @@ Player.prototype.setGameEvents = function() {
    this.events.on('chat', mess => {
       Game.sendChat(mess, this.location);
    });
-   this.events.on('disconnect', () => this.setOnlineState(false));
+   this.events.on('disconnect', () => {
+      this.setOnlineState(false);
+   });
    this.events.on('EXIT_GAME', () => {
       Game._forceEndGame(this);
    });
@@ -112,6 +117,10 @@ Player.prototype.setGameEvents = function() {
       this._messQueueIndex(last_mess_id);
       if (this.messQueue.length > 0) this._sendToMaster();
    });
+};
+
+Player.prototype.getBotTimeout = function() {
+   return this._isOnline ? 30 * 1000 : 3 * 1000;
 };
 
 const setEvents = (socket, events, game) => {

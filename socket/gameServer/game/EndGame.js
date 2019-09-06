@@ -24,6 +24,7 @@ function run(e, mode, forceEndPlayer) {
    });
 
    removeGame(e.room_id);
+   e = {};
 }
 
 function post_endGame(e, PD) {

@@ -20,7 +20,7 @@ let pinginterval = null;
 let pingResp = true;
 let token;
 const pingTimeDom = $("#pingTime");
-pingTimeDom.html('V3');
+pingTimeDom.html('V3.1');
 
 
 const Game = {
