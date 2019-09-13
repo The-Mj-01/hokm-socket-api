@@ -7,7 +7,7 @@ import ui from "./ui";
 
 console.log('v3.2');
 
-const useUrl = false;
+const useUrl = true;
 const SOCKET_URL = useUrl ? 'ws://95.216.106.170' : '';
 
 let socket = null;
@@ -74,7 +74,7 @@ const connectTOS = function() {
     config.setRoom_id(mess.room_id);
     config.setLocation(mess.location);
   });
-  
+
   socket.on("GAME", mess => {
     console.log(mess);
 
