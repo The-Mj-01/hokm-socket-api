@@ -223,12 +223,14 @@ const game_alert = function(mess) {
    ui.showMessage(mess);
 };
 
+const moveMess = function(mess) {
+   ui.showMoveMess(mess);
+};
 function deskMove(x) {
    x
       ? desk.removeClass('hide').addClass('show')
       : desk.removeClass('show').addClass('hide');
 }
-
 const teamScore = function(mess) {
    function getOurTeam(loc) {
       if (loc === 2 || loc === 0) return { our: 'topB', their: 'rightL' };
@@ -292,7 +294,7 @@ const player_connect = function(mess) {
    player.display.offline(false);
 };
 
-let routers = {
+const routers = {
    game_start: game_start,
    setHakem: game_setHakem,
    newRound: game_newRound,
@@ -308,13 +310,14 @@ let routers = {
    leftPlayer: game_leftPlayer,
    chat: chat,
    player_disconnect: player_disconnect,
-   player_connect: player_connect
+   player_connect: player_connect,
+   moveMess,
+
 };
 export default function(mess) {
    room_id = config.getRoom_id();
-   let COM;
-   let res;
-   if (mess.COM) COM = mess.COM;
-   if (mess.res) res = mess.res;
+   const COM = mess.COM
+   const res = (mess.res) ? mess.res : undefined
+
    if (typeof routers[COM] === 'function') routers[COM](res);
 }

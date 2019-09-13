@@ -16,7 +16,8 @@ async function run(e, card, location) {
 
    const player = e.table.getTurnPlayer();
    if (!player) return console.log('alert no player');
-   if (!player.cards.map(c => c.id).includes(card.id)) return
+   if (!player.cards.map(c => c.id).includes(card.id)) return player.pushEvent('moveMess' , 'BAD CARD')
+   return player.pushEvent('moveMess' , 'BAD CARD')
    if (typeof e.table.suit === 'undefined') {
       // don't use !e.table.suit
       e.table.suit = card.suit;

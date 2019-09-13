@@ -3,10 +3,9 @@ import loadingPage from "./loadingPage";
 import NamePage from "./NamePage";
 import game_core from "./game_core";
 import config from "./config";
-import Debug from "./Debug";
 import ui from "./ui";
 
-console.log('v3');
+console.log('v3.2');
 
 const useUrl = false;
 const SOCKET_URL = useUrl ? 'ws://95.216.106.170' : '';
@@ -20,7 +19,7 @@ let pinginterval = null;
 let pingResp = true;
 let token;
 const pingTimeDom = $("#pingTime");
-pingTimeDom.html('V3.1');
+pingTimeDom.html('V3.2');
 
 
 const Game = {
@@ -65,27 +64,29 @@ const connectTOS = function() {
   window.socket = socket;
   socket.on("connect", onConnect);
   socket.on("disconnect", r => {
-    pingTimeDom.html("Disconnected !");
+    pingTimeDom.html("Disconnected!!!");
     evenDisconnected = true;
     console.log("socket disconnect", r);
-    Debug.log("disconnect");
   });
+
   socket.on("config", mess => {
     console.log("config", mess);
     config.setRoom_id(mess.room_id);
     config.setLocation(mess.location);
   });
+  
   socket.on("GAME", mess => {
     console.log(mess);
-    Debug.log("GAME", mess);
 
     if (mess.mess_ID) {
       const { mess_ID } = mess;
       if (mess_ID - last_mess_id === 1) last_mess_id = mess_ID;
       else {
-        updatePingDom('Connecting...');
         console.warn("bad mess ID", { last_mess_id, mess_ID });
-        (mess_ID > last_mess_id)  ? ping() : undefined
+        if (mess_ID > last_mess_id) {
+          ping()
+          updatePingDom('updating...')
+        }
         return;
       }
     }
@@ -94,7 +95,6 @@ const connectTOS = function() {
   socket.on("connect_error", error => console.log("connect_error", error));
   socket.on("error", error => {
     console.log("error", error);
-    Debug.log("socket error", error);
   });
   socket.on("connect_timeout", error => console.log("connect_timeout", error));
   socket.on("reconnect", x => console.log("reconnect", x));
@@ -109,15 +109,10 @@ const connectTOS = function() {
     const pingTime = Date.now() - pingTimeStart;
     updatePingDom(pingTime + " ms");
   });
-  socket.on("debug", m => {
-    console.log("deb", m);
-    Debug.log("deb", m);
-  });
   socket.on("token", t => (token = t));
 };
 
 function onConnect() {
-  Debug.log("connected");
   pingTimeDom.html("Connected");
   if (token) socket.emit("token", token);
   else if (!evenDisconnected) join_room();
@@ -135,7 +130,7 @@ function onConnect() {
 }
 
 function ping() {
-  if (!pingResp) updatePingDom("Time Out!!");
+  if (!pingResp) updatePingDom("Time Out!!!");
   pingResp = false;
   pingTimeStart = new Date().getTime();
   socket.emit("pingT", last_mess_id);
@@ -144,11 +139,6 @@ function ping() {
 function updatePingDom(ping) {
   pingTimeDom.html(ping);
 }
-
-pingTimeDom.on("click", () => {
-  window.socket.emit("debug");
-  Debug.show();
-});
 
 export default function() {
   Game.connect();

@@ -1,8 +1,7 @@
 import config from './config'
 
 export default function (cards, nc, game) {
-   if (window.socket.connected) {
-      const yourCard = game.run.getPlayers()[0].row.cards;
+
       let hasSuit = false;
       const currnetSuit = config.getSuit() * 1;
       if (currnetSuit === 0 || currnetSuit === 1 || currnetSuit === 2 || currnetSuit === 3) {
@@ -22,10 +21,5 @@ export default function (cards, nc, game) {
             }
          }
       );
-      return true;
 
-   } else {
-      alert("disconnected from server");
-      return false;
-   }
-};
+}

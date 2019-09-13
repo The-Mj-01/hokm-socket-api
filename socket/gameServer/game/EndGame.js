@@ -24,7 +24,6 @@ function run(e, mode, forceEndPlayer) {
    });
 
    removeGame(e.room_id);
-   e = {};
 }
 
 function post_endGame(e, PD) {
@@ -43,7 +42,7 @@ function post_forceEndGame(e, PD, forceEndPlayer) {
       gameType: e.gameType,
       forceEndPlayer: {
          name: forceEndPlayer.name,
-         location: forceEndPlayer.location
+         location: forceEndPlayer.location,
       },
       room_id: e.room_id,
       players: PD,
@@ -57,7 +56,7 @@ function post_gameIsClose(e, PD, forceEndPlayer) {
       gameType: e.gameType,
       forceEndPlayer: {
          name: forceEndPlayer.name,
-         location: forceEndPlayer.location
+         location: forceEndPlayer.location,
       },
       room_id: e.room_id,
       players: PD,
@@ -66,21 +65,9 @@ function post_gameIsClose(e, PD, forceEndPlayer) {
 }
 
 daleteBadPlayersData = function(e) {
-   let p = [];
-   e.players.toArray().forEach(player => {
-      p.push({
-         name: player.name,
-         location: player.location
-      });
-      if (player.id) {
-         p.push({
-            id: player.id
-         });
-      }
-   });
    return e.players.toArray().map(p => {
-      const { name, location, tgID } = p;
-      return { name, location, tgID };
+      const { name, location, tgID , _isOnline } = p;
+      return { name, location, tgID , online: _isOnline };
    });
 };
 module.exports = run;
