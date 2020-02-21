@@ -7,7 +7,7 @@ import ui from "./ui";
 
 console.log('v3.2');
 
-const useUrl = true;
+const useUrl = false;
 const SOCKET_URL = useUrl ? 'ws://95.216.106.170' : '';
 
 let socket = null;
